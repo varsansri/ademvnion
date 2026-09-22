@@ -1,0 +1,6 @@
+# ademvnion.com — everything here is meant to be found. Scripts and assets are
+# crawlable on purpose: blocking them stops Google rendering the pages.
+User-agent: *
+Allow: /
+
+Sitemap: https://ademvnion.com/sitemap.xml

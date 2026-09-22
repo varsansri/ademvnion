@@ -1,0 +1,26 @@
+# Ademvnion
+
+> Adem is building Vnion, wearable human enhancement. The software it ships
+> today is free, runs in a browser, and needs no account: a robot design tool
+> with real physics, and interactive teardowns of real open-source robots.
+
+## Pages
+
+- [Adem Forge](https://ademvnion.com/app/): free robot design software in the
+  browser. Snap parts together, set mass, motor torque, joint limits and
+  friction, press Run, and watch real physics (Google DeepMind's MuJoCo,
+  compiled to WebAssembly) decide whether it works. Tasks report whether the
+  robot lifted, travelled or stayed standing. Builds share as a link.
+- [Inside the SO-ARM101](https://ademvnion.com/inside/so-arm101/): every part
+  of a real open-source robot arm in 3D — six STS3215 servos, driver board,
+  printed links — with what each part is, why it is there, what it costs, and
+  what breaks without it. Parts can be hidden, the assembly exploded, the
+  joints moved. Built from The Robot Studio's Apache-2.0 CAD and URDF.
+- [Inside real robots](https://ademvnion.com/inside/): the teardown index.
+- [Home](https://ademvnion.com/): what Adem and Vnion are.
+
+## Notes
+
+- Everything is free and needs no sign-up. There is no hardware for sale.
+- Numbers on the teardown pages come from published CAD, datasheets and bills
+  of materials, not estimates.

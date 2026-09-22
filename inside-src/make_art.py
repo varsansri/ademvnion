@@ -86,3 +86,42 @@ for size, name, pad in ((180, 'apple-touch-icon.png', 0.14), (64, 'favicon.png',
     p = os.path.join(OUT, name)
     icon.save(p)
     print(name, icon.size, f'{os.path.getsize(p) / 1024:.0f} KB')
+
+# 4. The card other sites show when the link is shared, and what Google may
+# pick up: 1200x630. The engraving sits to the right, dimmed and under a scrim,
+# so the words stay readable over it.
+from PIL import ImageDraw, ImageFont
+
+
+def font(name, size):
+    for p in (f'C:/Windows/Fonts/{name}', f'/usr/share/fonts/truetype/dejavu/{name}'):
+        if os.path.exists(p):
+            return ImageFont.truetype(p, size)
+    return ImageFont.load_default()
+
+
+card = Image.new('RGBA', (1200, 630), (7, 8, 11, 255))
+plate = art.resize((980, round(980 * art.height / art.width)), Image.LANCZOS)
+dim = np.asarray(plate).copy()
+dim[..., 3] = (dim[..., 3] * 0.7).astype(np.uint8)
+card.alpha_composite(Image.fromarray(dim, 'RGBA'), (330, 630 - plate.height - 20))
+
+scrim = np.zeros((630, 1200, 4), np.uint8)
+scrim[..., 0], scrim[..., 1], scrim[..., 2] = 7, 8, 11
+x = np.linspace(0, 1, 1200)
+scrim[..., 3] = np.clip((1 - x / 0.72) * 255, 0, 255)[None, :].astype(np.uint8)
+card.alpha_composite(Image.fromarray(scrim, 'RGBA'))
+
+mark = trim(ink(Image.open(os.path.join(SRC, logo_src)), floor=10, gain=1.2))
+mark = mark.resize((84, round(84 * mark.height / mark.width)), Image.LANCZOS)
+card.alpha_composite(mark, (72, 66))
+d = ImageDraw.Draw(card)
+d.text((174, 74), 'ADEMVNION', font=font('segoeuib.ttf', 30), fill=(238, 234, 226, 255))
+d.text((176, 114), 'wearable human enhancement', font=font('segoeui.ttf', 20), fill=(150, 156, 170, 255))
+d.text((72, 250), 'Human,', font=font('segoeui.ttf', 96), fill=(255, 255, 255, 255))
+d.text((72, 350), 'enhanced.', font=font('segoeui.ttf', 96), fill=(168, 175, 190, 255))
+d.text((76, 492), 'Design a robot in your browser.', font=font('segoeui.ttf', 28), fill=(196, 202, 214, 255))
+d.text((76, 532), 'Take a real one apart.', font=font('segoeui.ttf', 28), fill=(196, 202, 214, 255))
+p = os.path.join(OUT, 'og.jpg')
+card.convert('RGB').save(p, quality=84, optimize=True)
+print('og.jpg', card.size, f'{os.path.getsize(p) / 1024:.0f} KB')

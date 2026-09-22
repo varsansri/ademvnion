@@ -133,6 +133,18 @@ page = f'''<!doctype html>
 <meta property="og:title" content="Inside the SO-ARM101 — every part, explained">
 <meta property="og:description" content="Click any part of a real open-source robot arm and see what it is, why it is there, and what breaks without it.">
 <meta name="theme-color" content="#07080b">
+<meta property="og:site_name" content="Ademvnion">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ademvnion.com/inside/so-arm101/">
+<meta property="og:image" content="https://ademvnion.com/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Inside the SO-ARM101 — every part, explained">
+<meta name="twitter:description" content="Click any part of a real open-source robot arm and see what it is, why it is there, what it costs, and what breaks without it.">
+<meta name="twitter:image" content="https://ademvnion.com/img/og.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://ademvnion.com/"},{"@type":"ListItem","position":2,"name":"Inside real robots","item":"https://ademvnion.com/inside/"},{"@type":"ListItem","position":3,"name":"SO-ARM101","item":"https://ademvnion.com/inside/so-arm101/"}]}</script>
+
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%272%27 y=%272%27 width=%2728%27 height=%2728%27 rx=%278%27 fill=%27%2307080b%27 stroke=%27%23f4f5f7%27 stroke-width=%272.5%27/%3E%3Ctext x=%2716%27 y=%2722%27 text-anchor=%27middle%27 font-family=%27system-ui%27 font-weight=%27700%27 font-size=%2717%27 fill=%27%23f4f5f7%27%3EA%3C/text%3E%3C/svg%3E">
 <!-- Umami. Every page needs its own copy: four static builds, no shared include. -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="473ac96b-268f-4710-9840-e8f27f67fac9"></script>
