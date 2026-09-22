@@ -1,1 +1,9 @@
 node_modules/
+
+# Mesh pipeline inputs and intermediates: downloaded from TheRobotStudio/SO-ARM100
+# and rebuilt by build_so101.py / pack_meshes.py. The committed result is the
+# single packed public/so-arm101/so101.glb.
+so101/raw/
+so101/glb/
+so101/scene.glb
+__pycache__/
