@@ -90,3 +90,14 @@ footer{border-top:1px solid var(--line);padding:24px var(--gutter);color:var(--d
 }
 
 .fitbtn{position:absolute;right:10px;top:10px}
+
+/* Questions block: same three the /ai/ reference and the FAQ schema carry. */
+.qa{border-top:1px solid var(--line);margin-top:48px;padding-top:36px}
+.qa h2{margin-bottom:18px}
+.qa details{border-bottom:1px solid var(--line);padding:14px 0}
+.qa summary{cursor:pointer;font-size:16px;font-weight:500;list-style:none}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary::before{content:"+";display:inline-block;width:20px;color:var(--muted)}
+.qa details[open] summary::before{content:"\2013"}
+.qa details p{margin:10px 0 0 20px;color:var(--muted);max-width:68ch}
+.qanote{margin-top:20px;font-size:13px;color:var(--muted)}

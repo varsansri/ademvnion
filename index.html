@@ -144,6 +144,19 @@
   footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   footer a:hover{color:var(--fg)}
 
+  /* The questions block: the same three the /ai/ reference and the FAQ
+     structured data carry. Visible, because hidden text is cloaking. */
+  .qa{border-top:1px solid var(--line)}
+  .qa h2{margin-bottom:22px}
+  .qa details{border-bottom:1px solid var(--line);padding:16px 0}
+  .qa summary{cursor:pointer;font-size:17px;font-weight:500;list-style:none}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary::before{content:"+";display:inline-block;width:22px;color:var(--muted)}
+  .qa details[open] summary::before{content:"–"}
+  .qa details p{margin:12px 0 0 22px;color:var(--muted);max-width:68ch}
+  .qanote{margin-top:22px;font-size:13px;color:var(--muted)}
+  .qanote a{color:var(--fg);border-bottom:1px solid var(--line)}
+
   @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Adem","alternateName":"Ademvnion","url":"https://ademvnion.com/","logo":"https://ademvnion.com/img/apple-touch-icon.png","image":"https://ademvnion.com/img/og.jpg","description":"Adem builds Vnion, wearable human enhancement, and ships free browser software for designing robots and taking real ones apart."}</script>
@@ -371,6 +384,10 @@
     </div>
   </section>
 </main>
+
+<!-- qa:start -->
+<section id="questions" class="qa"><div class="wrap"><h2>Questions</h2><details><summary>What is Ademvnion?</summary><p>Adem is a company building Vnion, a line of wearable human enhancement — the bet that instead of building machines that outclass people, you put the capability on the person. The software it ships today is free and runs in a browser: Adem Forge for designing robots, and interactive teardowns of real open-source robots.</p></details><details><summary>Can I buy a Vnion helmet?</summary><p>No. Adem is early stage: there is no hardware for sale and no pre-order. The free browser software is what exists today.</p></details><details><summary>Why would anyone wear enhancement rather than build a robot to do the work?</summary><p>Because piloting a machine from a chair gives you the machine's capability and none of the experience. Adem's argument is that strength, speed, sight and hearing can be extended from the outside, by something worn, and that the person stays in the world rather than watching it on a screen.</p></details><p class="qanote">Plain-text version for AI tools: <a href="/ai/home.md">/ai/home.md</a> &middot; <a href="/ai/llms.txt">all references</a></p></div></section>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is Ademvnion?","acceptedAnswer":{"@type":"Answer","text":"Adem is a company building Vnion, a line of wearable human enhancement \u2014 the bet that instead of building machines that outclass people, you put the capability on the person. The software it ships today is free and runs in a browser: Adem Forge for designing robots, and interactive teardowns of real open-source robots."}},{"@type":"Question","name":"Can I buy a Vnion helmet?","acceptedAnswer":{"@type":"Answer","text":"No. Adem is early stage: there is no hardware for sale and no pre-order. The free browser software is what exists today."}},{"@type":"Question","name":"Why would anyone wear enhancement rather than build a robot to do the work?","acceptedAnswer":{"@type":"Answer","text":"Because piloting a machine from a chair gives you the machine's capability and none of the experience. Adem's argument is that strength, speed, sight and hearing can be extended from the outside, by something worn, and that the person stays in the world rather than watching it on a screen."}}]}</script><!-- qa:end -->
 
 <footer>
   <div class="wrap">

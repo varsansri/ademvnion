@@ -1,0 +1,18 @@
+# Ademvnion — AI reference index
+
+> Adem builds Vnion, wearable human enhancement. The software it ships today is free, runs in a browser and needs no account: Adem Forge for designing robots against real physics, and interactive teardowns of real open-source robots.
+
+Updated 2026-09-22. Each reference below is a plain-text twin of a canonical HTML page, carrying an HTTP canonical link back to it. They are deliberately absent from sitemap.xml so they do not compete with the pages they describe. No claim is made that any model ingests, cites or ranks them.
+
+## Pages
+
+- [Adem Forge — robot design software in the browser](https://ademvnion.com/app/) — reference: https://ademvnion.com/ai/forge.md
+- [Inside the SO-ARM101 — every part of an open-source robot arm](https://ademvnion.com/inside/so-arm101/) — reference: https://ademvnion.com/ai/so-arm101.md
+- [Inside real robots — interactive teardowns](https://ademvnion.com/inside/) — reference: https://ademvnion.com/ai/inside.md
+- [Ademvnion — wearable human enhancement](https://ademvnion.com/) — reference: https://ademvnion.com/ai/home.md
+
+## Supporting files
+
+- [Everything in one file](https://ademvnion.com/ai/llms-full.txt): all references concatenated.
+- [Structured reference](https://ademvnion.com/ai/knowledge.json): the same facts, questions and URLs as JSON.
+- [Site discovery file](https://ademvnion.com/llms.txt): the short version at the root.
