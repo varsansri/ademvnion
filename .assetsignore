@@ -1,6 +1,7 @@
-# Not served by the Cloudflare Worker (source, tooling, notes)
+# Not served by the Cloudflare Worker (source, tooling)
 forge/
 inside-src/
 .gitignore
 .assetsignore
-*.md
+# No blanket *.md rule: every tracked .md is an /ai/ reference meant to be
+# fetched by AI crawlers. Keep notes out of this repo instead.
