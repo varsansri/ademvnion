@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import './inside.css'
 
 // Interactive teardown. The data file comes from build_so101.py: links and
@@ -23,12 +24,15 @@ const CAT_LABEL: Record<string, string> = { actuator: 'Actuators', electronics: 
 async function main(stage: HTMLElement, side: HTMLElement) {
   const data: Data = await (await fetch('./data.json')).json()
   const parts = new Map(data.parts.map(p => [p.id, p]))
+  let dirty = true
+  const invalidate = () => { dirty = true }
   const state = { selected: null as string | null, hidden: new Set<string>(), explode: 0, xray: false, q: {} as Record<string, number>, hover: null as string | null }
 
   // --- three.js scene ---
-  const renderer = new THREE.WebGLRenderer({ antialias: true })
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
-  renderer.shadowMap.enabled = true
+  const small = matchMedia('(max-width: 900px)').matches
+  const renderer = new THREE.WebGLRenderer({ antialias: !small, powerPreference: 'high-performance' })
+  renderer.setPixelRatio(Math.min(devicePixelRatio, small ? 1.5 : 2))
+  renderer.shadowMap.enabled = !small
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
   stage.appendChild(renderer.domElement)
   const scene = new THREE.Scene()
@@ -45,7 +49,7 @@ async function main(stage: HTMLElement, side: HTMLElement) {
   const sun = new THREE.DirectionalLight('#ffffff', 2.4)
   sun.position.set(0.8, -1.2, 1.6)
   sun.castShadow = true
-  sun.shadow.mapSize.set(2048, 2048)
+  sun.shadow.mapSize.set(1024, 1024)
   const sc = sun.shadow.camera as THREE.OrthographicCamera
   sc.left = sc.bottom = -0.8; sc.right = sc.top = 0.8; sc.near = 0.2; sc.far = 5
   sun.shadow.bias = -0.0004
@@ -84,17 +88,37 @@ async function main(stage: HTMLElement, side: HTMLElement) {
   attach(rootLink)
 
   // --- visuals ---
+  // One meshopt-compressed file for the whole robot (~110 KB); geometry by node name.
   const loader = new GLTFLoader()
-  const meshCache = new Map<string, Promise<THREE.BufferGeometry>>()
-  const loadGeo = (mesh: string) => {
-    if (!meshCache.has(mesh)) meshCache.set(mesh, loader.loadAsync(`./glb/${mesh}.glb`).then(g => {
-      let geo: THREE.BufferGeometry | null = null
-      g.scene.traverse(o => { if (!geo && (o as THREE.Mesh).isMesh) geo = (o as THREE.Mesh).geometry })
-      if (!geo) throw new Error('empty mesh ' + mesh)
-      ;(geo as THREE.BufferGeometry).computeVertexNormals()
-      return geo as THREE.BufferGeometry
-    }))
-    return meshCache.get(mesh)!
+  loader.setMeshoptDecoder(MeshoptDecoder)
+  const pack = await loader.loadAsync('./so101.glb')
+  const geos = new Map<string, THREE.BufferGeometry>()
+  pack.scene.updateMatrixWorld(true)
+  pack.scene.traverse(o => {
+    const m = o as THREE.Mesh
+    if (!m.isMesh) return
+    // The named node is an ancestor; quantised meshes sit under an extra
+    // scale/offset node, so bake everything below the named node into the geometry.
+    let named: THREE.Object3D | null = o
+    while (named && (!named.name || /^mesh_\d+$/.test(named.name))) named = named.parent // loader auto-names meshes mesh_N
+    if (!named) return
+    const rel = new THREE.Matrix4().copy(named.matrixWorld).invert().multiply(m.matrixWorld)
+    // Quantised (int16) positions must become floats before any transform is baked in.
+    const src = m.geometry.attributes.position
+    const pos = new Float32Array(src.count * 3)
+    for (let i = 0; i < src.count; i++) { pos[i * 3] = src.getX(i); pos[i * 3 + 1] = src.getY(i); pos[i * 3 + 2] = src.getZ(i) }
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+    if (m.geometry.index) geo.setIndex(m.geometry.index.clone())
+    geo.applyMatrix4(rel)
+    geo.computeVertexNormals()
+    geo.computeBoundingSphere()
+    if (!geos.has(named.name)) geos.set(named.name, geo)
+  })
+  const loadGeo = async (mesh: string) => {
+    const g = geos.get(mesh)
+    if (!g) throw new Error('missing mesh ' + mesh)
+    return g
   }
   const linkIndex = new Map(data.links.map((l, i) => [l.name, i]))
   const meshes: THREE.Mesh[] = []
@@ -227,6 +251,7 @@ async function main(stage: HTMLElement, side: HTMLElement) {
   const applyJoints = () => { jointGroups.forEach(({ pivot, axis, j }) => pivot.quaternion.setFromAxisAngle(axis, state.q[j.name] ?? 0)) }
 
   const select = (partId: string | null) => {
+    invalidate()
     state.selected = partId
     if (partId && parts.has(partId)) { partView(parts.get(partId)!); history.replaceState(null, '', '#part=' + partId) }
     else { listView(); if (location.hash) history.replaceState(null, '', location.pathname) }
@@ -260,21 +285,27 @@ async function main(stage: HTMLElement, side: HTMLElement) {
 
   // --- render loop ---
   const resize = () => { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix() }
-  new ResizeObserver(resize).observe(stage)
+  new ResizeObserver(() => { resize(); invalidate() }).observe(stage)
   resize()
   const SELC = new THREE.Color('#7dd3fc'), HOVC = new THREE.Color('#c084fc')
-  let t = 0
+  // Render on demand: nothing is drawn while the page sits still.
+  controls.addEventListener('change', invalidate)
+  renderer.domElement.addEventListener('pointermove', invalidate)
+  side.addEventListener('input', invalidate)
+  side.addEventListener('click', invalidate)
   renderer.setAnimationLoop(() => {
-    t += 0.05
+    if (!dirty && !fitTarget) return
+    dirty = false
     for (const mesh of meshes) {
       const mat = mesh.material as THREE.MeshStandardMaterial
-      if (mesh.userData.part === state.selected) { mat.emissive.copy(SELC); mat.emissiveIntensity = 0.35 + 0.15 * Math.sin(t) }
+      if (mesh.userData.part === state.selected) { mat.emissive.copy(SELC); mat.emissiveIntensity = 0.4 }
       else if (mesh.userData.part === state.hover) { mat.emissive.copy(HOVC); mat.emissiveIntensity = 0.25 }
       else mat.emissiveIntensity = 0
     }
     if (fitTarget) {
       controls.target.lerp(fitTarget.c, 0.12); camera.position.lerp(fitTarget.pos, 0.12)
       if (camera.position.distanceTo(fitTarget.pos) < 0.002) fitTarget = null
+      dirty = true
     }
     controls.update()
     renderer.render(scene, camera)
