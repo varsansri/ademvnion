@@ -1,0 +1,80 @@
+{
+ "base_motor_holder_so101_v1": {
+  "tris": 11262,
+  "orig": 37540,
+  "volume_cm3": 23.7,
+  "bytes": 203452
+ },
+ "base_so101_v2": {
+  "tris": 5658,
+  "orig": 9430,
+  "volume_cm3": 122.7,
+  "bytes": 101008
+ },
+ "motor_holder_so101_base_v1": {
+  "tris": 6774,
+  "orig": 22586,
+  "volume_cm3": 13.3,
+  "bytes": 122408
+ },
+ "motor_holder_so101_wrist_v1": {
+  "tris": 6312,
+  "orig": 21042,
+  "volume_cm3": 13.9,
+  "bytes": 114064
+ },
+ "moving_jaw_so101_v1": {
+  "tris": 10186,
+  "orig": 28270,
+  "volume_cm3": 20.7,
+  "bytes": 183796
+ },
+ "rotation_pitch_so101_v1": {
+  "tris": 6896,
+  "orig": 17672,
+  "volume_cm3": 68.8,
+  "bytes": 124588
+ },
+ "sts3215_03a_no_horn_v1": {
+  "tris": 6368,
+  "orig": 17316,
+  "volume_cm3": 35.7,
+  "bytes": 115348
+ },
+ "sts3215_03a_v1": {
+  "tris": 6384,
+  "orig": 19080,
+  "volume_cm3": 36.2,
+  "bytes": 115636
+ },
+ "under_arm_so101_v1": {
+  "tris": 11854,
+  "orig": 39516,
+  "volume_cm3": 92.9,
+  "bytes": 213784
+ },
+ "upper_arm_so101_v1": {
+  "tris": 8544,
+  "orig": 26068,
+  "volume_cm3": 117.4,
+  "bytes": 154244
+ },
+ "waveshare_mounting_plate_so101_v2": {
+  "tris": 752,
+  "orig": 1254,
+  "volume_cm3": 9.1,
+  "bytes": 14224
+ },
+ "wrist_roll_follower_so101_v1": {
+  "tris": 14120,
+  "orig": 28796,
+  "volume_cm3": 56.6,
+  "bytes": 254452
+ },
+ "wrist_roll_pitch_so101_v2": {
+  "tris": 16198,
+  "orig": 53994,
+  "volume_cm3": 32.3,
+  "bytes": 292024
+ }
+}

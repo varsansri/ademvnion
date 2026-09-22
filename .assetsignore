@@ -1,5 +1,6 @@
 # Not served by the Cloudflare Worker (source, tooling, notes)
 forge/
+inside-src/
 .gitignore
 .assetsignore
 *.md

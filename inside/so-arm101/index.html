@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inside the SO-ARM101 — Every Part of an Open-Source Robot Arm</title>
+<meta name="description" content="Interactive teardown of the SO-ARM101 robot arm: all 18 parts in 3D — servos, gears, encoder, driver board, printed links. Click any part to learn what it does, hide it, explode the assembly, move the joints.">
+<link rel="canonical" href="https://ademvnion.com/inside/so-arm101/">
+<meta property="og:title" content="Inside the SO-ARM101 — every part, explained">
+<meta property="og:description" content="Click any part of a real open-source robot arm and see what it is, why it is there, and what breaks without it.">
+<meta name="theme-color" content="#07080b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%272%27 y=%272%27 width=%2728%27 height=%2728%27 rx=%278%27 fill=%27%2307080b%27 stroke=%27%23f4f5f7%27 stroke-width=%272.5%27/%3E%3Ctext x=%2716%27 y=%2722%27 text-anchor=%27middle%27 font-family=%27system-ui%27 font-weight=%27700%27 font-size=%2717%27 fill=%27%23f4f5f7%27%3EA%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much does it cost to build the SO-ARM101?", "acceptedAnswer": {"@type": "Answer", "text": "About $146 for one follower arm: six STS3215 servos (~$83), the driver board ($10.60), power supply, cable, clamps and roughly $25 of 3D printing. A leader arm for teleoperation roughly doubles it."}}, {"@type": "Question", "name": "How strong is the SO-ARM101?", "acceptedAnswer": {"@type": "Answer", "text": "Each STS3215 servo stalls at about 1.6 N\u00b7m (16.5 kg\u00b7cm) at 6 V. With a 45 cm reach the arm lifts roughly 200\u2013300 g at full extension; the 12 V servo variant nearly doubles that."}}, {"@type": "Question", "name": "How many parts are in it?", "acceptedAnswer": {"@type": "Answer", "text": "11 3D-printed parts, 6 servos, 1 driver board, 6 bus cables and the screws that ship with the servos."}}, {"@type": "Question", "name": "Is it really open source?", "acceptedAnswer": {"@type": "Answer", "text": "Yes \u2014 the CAD, STL and STEP files, URDF, and bill of materials are published under Apache-2.0 by The Robot Studio. This explorer uses those files unchanged apart from mesh simplification."}}, {"@type": "Question", "name": "Can I change parts here?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Click any part to read about it, hide it to see what it was holding, pull the exploded-view slider to separate the assembly, and move every joint with the sliders."}}]}</script>
+  <script type="module" crossorigin src="/inside/assets/so101-02gmHZYR.js"></script>
+  <link rel="modulepreload" crossorigin href="/inside/assets/inside-zPf1ei8s.js">
+  <link rel="stylesheet" crossorigin href="/inside/assets/inside-BXLHgis8.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/"><span class="mark">A</span> Adem <em>Inside</em></a>
+  <nav><a href="/inside/">All robots</a><a href="/app/">Forge — design your own</a></nav>
+</header>
+<main>
+  <section class="hero">
+    <h1>Inside the SO-ARM101</h1>
+    <p class="lede">A six-motor, 3D-printed robot arm that costs about $120 in parts. It is the arm Hugging Face uses to teach robots by demonstration (LeRobot), and one of the most-built open robots in the world. Below is every part of it — click one.</p>
+    <p class="totals"><span><b>18</b> parts shown</span><span><b>6</b> motors</span><span><b>≈754 g</b></span><span><b>≈$146</b> to build</span><span><b>45 cm</b> reach</span></p>
+  </section>
+  <section id="explorer" class="explorer">
+    <div class="stage" id="stage"><noscript>The interactive 3D view needs JavaScript. The full parts list is below.</noscript></div>
+    <aside class="side" id="side"></aside>
+  </section>
+  <section class="content">
+    <h2>What the six joints do</h2>
+    <ul class="joints"><li><b>Shoulder pan</b> — Turns the whole arm left and right on the base. Range -110° to 110°.</li><li><b>Shoulder lift</b> — Raises and lowers the upper arm. The hardest-working joint: it lifts everything beyond it. Range -100° to 100°.</li><li><b>Elbow</b> — Bends the forearm toward or away from the upper arm. Range -97° to 97°.</li><li><b>Wrist flex</b> — Tilts the gripper up and down. Range -95° to 95°.</li><li><b>Wrist roll</b> — Twists the gripper about the forearm axis so it can approach from any angle. Range -157° to 163°.</li><li><b>Gripper</b> — Opens and closes the moving jaw. Range -10° to 100°.</li></ul>
+    <h2>Every part, explained</h2>
+    <p class="src">Source files: <a href="https://github.com/TheRobotStudio/SO-ARM100" rel="noopener" target="_blank">TheRobotStudio/SO-ARM100</a> (Apache-2.0). Parts, prices and figures follow the project README; printed-part masses are estimates from print volume.</p>
+    <h3 id="actuator">Actuators</h3><article class="part" id="part-sts3215" data-part="sts3215">
+  <h4>Feetech STS3215 serial bus servo (7.4 V, 1:345) <span class="qty">× 6</span></h4>
+  <p class="meta">Aluminium/plastic case, metal gears, coreless DC motor, PCB · ≈ 60 g each · $13.89 each</p>
+  <p><b>What it is.</b> A smart motor. It is a small DC motor, a 345:1 gearbox, a position sensor and a tiny computer in one box. You tell it an angle over a serial cable and it goes there and holds.</p>
+  <p><b>Why it is there.</b> Six of these are the entire muscle system of the arm. There are no separate motor drivers, encoders or wiring harnesses because each servo contains its own. That is what makes a $120 robot arm possible.</p>
+  <ul class="spec"><li><b>Stall torque:</b> 16.5 kg·cm ≈ 1.6 N·m at 6 V (30 kg·cm for the 12 V version)</li><li><b>Speed:</b> ≈ 0.22 s per 60° at 7.4 V</li><li><b>Position sensor:</b> 12-bit magnetic encoder, 4,096 steps per turn</li><li><b>Control:</b> TTL serial bus, 1 Mbps, daisy-chained; each servo has an ID</li><li><b>Voltage:</b> 6–7.4 V (12 V variant available)</li><li><b>Gear ratio:</b> 1:345 metal gears</li><li><b>Modes:</b> position, constant speed, PWM; reports position, load, temperature, voltage</li></ul>
+  <p><b>Inside it:</b></p><ul class="inside"><li><b>Coreless DC motor</b> — Spins at thousands of rpm with almost no torque. Everything else exists to slow it down and make it precise.</li><li><b>Metal gear train (1:345)</b> — Five stages of gears trade speed for torque: 345 turns of the motor = 1 turn of the output horn.</li><li><b>Magnetic encoder (12-bit)</b> — A magnet on the output shaft and a Hall-effect chip read the angle to 1/4096 of a turn — the servo always knows where it is, even after power loss.</li><li><b>Control MCU</b> — A microcontroller runs the position loop hundreds of times a second and speaks the serial protocol.</li><li><b>H-bridge driver (MOSFETs)</b> — Four transistors switch battery current into the motor in either direction.</li><li><b>Case, bearing and output horn</b> — The horn is the splined disc the printed parts bolt to; a bearing takes side loads off the gears.</li></ul>
+  <p><b>Take it out and…</b> Remove one and that joint goes limp — the arm folds under gravity at that point. Swap in the 12 V version and every joint gets almost twice the torque, for a 12 V supply.</p>
+  <p><a href="https://www.alibaba.com/product-detail/Top-Seller-Low-Cost-Feetech-STS3215_1600999461525.html" rel="nofollow noopener" target="_blank">Where to buy →</a></p>
+</article><h3 id="electronics">Electronics</h3><article class="part" id="part-waveshare_board" data-part="waveshare_board">
+  <h4>Waveshare Bus Servo Adapter (A) <span class="qty">× 1</span></h4>
+  <p class="meta">PCB with USB-C, DC jack, serial bus header · ≈ 15 g each · $10.60 each</p>
+  <p><b>What it is.</b> The bridge between the computer and the servos. It takes USB from your laptop and 5–12 V from the power supply and puts both onto the three-wire servo bus.</p>
+  <p><b>Why it is there.</b> All six servos daisy-chain onto one cable that ends here. One board, one USB port, one power jack — that is the entire wiring of the arm.</p>
+  <ul class="spec"><li><b>Input:</b> USB-C data + 5–12 V DC power</li><li><b>Output:</b> TTL and RS485 servo bus headers</li><li><b>Servos supported:</b> up to 253 on one bus</li><li><b>Size:</b> ≈ 50 × 40 mm</li></ul>
+  <p><b>Inside it:</b></p><ul class="inside"><li><b>USB-to-UART chip</b> — Turns USB into a plain serial stream the servos understand (typically a CH343-class converter).</li><li><b>Bus buffer / level shifter</b> — Drives the single half-duplex servo data line so several servos can share it without shouting over each other.</li><li><b>Power path</b> — A DC barrel jack, a switch and a fuse-sized trace deliver motor current straight to the bus — the USB side never carries motor power.</li><li><b>Status LEDs</b> — Power and data-activity indicators.</li></ul>
+  <p><b>Take it out and…</b> The arm is a sculpture. No commands reach the servos and no power does either.</p>
+  <p><a href="https://www.amazon.com/Waveshare-Integrates-Control-Circuit-Supports/dp/B0CTMM4LWK/" rel="nofollow noopener" target="_blank">Where to buy →</a></p>
+</article><article class="part" id="part-power_supply" data-part="power_supply">
+  <h4>Power supply 5 V, 5 A (barrel jack) <span class="qty">× 1</span></h4>
+  <p class="meta">Switch-mode wall adapter · ≈ 120 g each · $10.00 each</p>
+  <p><b>What it is.</b> Wall adapter that powers the servos through the driver board.</p>
+  <p><b>Why it is there.</b> USB alone gives 0.5–0.9 A; six servos can pull several amps when they stall, so motor power comes from here.</p>
+  <ul class="spec"><li><b>Output:</b> 5 V DC, 5 A (use 12 V 5 A+ for 12 V servos)</li><li><b>Connector:</b> 5.5 × 2.1 mm barrel</li></ul>
+  
+  <p><b>Take it out and…</b> Servos brown out and reset the moment they push against anything.</p>
+  <p><a href="https://www.amazon.com/Facmogu-Switching-Transformer-Compatible-5-5x2-1mm/dp/B087LY41PV/" rel="nofollow noopener" target="_blank">Where to buy →</a></p>
+</article><article class="part" id="part-usb_cable" data-part="usb_cable">
+  <h4>USB-C cable <span class="qty">× 1</span></h4>
+  <p class="meta">Copper, braided jacket · ≈ 30 g each · $7.00 each</p>
+  <p><b>What it is.</b> Carries commands from the computer to the driver board and sensor readings back.</p>
+  <p><b>Why it is there.</b> Position, load and temperature of all six servos stream back over this one cable at 1 Mbps.</p>
+  
+  
+  <p><b>Take it out and…</b> No control from the computer; the servos hold their last position.</p>
+  <p><a href="https://www.amazon.com/Charging-etguuds-Charger-Braided-Compatible/dp/B0B8NWLLW2/" rel="nofollow noopener" target="_blank">Where to buy →</a></p>
+</article><article class="part" id="part-servo_cables" data-part="servo_cables">
+  <h4>3-pin servo bus cables <span class="qty">× 6</span></h4>
+  <p class="meta">3-wire JST-style leads (power, ground, data) · ≈ 4 g each · included</p>
+  <p><b>What it is.</b> Short daisy-chain leads from servo to servo. They ship in the servo box.</p>
+  <p><b>Why it is there.</b> Because the bus is daisy-chained there are only six short cables in the whole arm, routed through the hollow printed links.</p>
+  
+  
+  <p><b>Take it out and…</b> Every servo past the missing cable goes dark.</p>
+  
+</article><h3 id="structure">3D-printed structure</h3><article class="part" id="part-base_so101_v2" data-part="base_so101_v2">
+  <h4>Base <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 68 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> The foot of the arm. A wide, flat printed shell that sits on the table and holds the first servo pointing straight up.</p>
+  <p><b>Why it is there.</b> Everything else hangs off this. Its width is what stops the arm tipping over when it reaches out; the table clamp bolts through it.</p>
+  <ul class="spec"><li><b>Print volume:</b> 123 cm³ solid</li><li><b>Triangles in CAD:</b> 9,430</li></ul>
+  
+  <p><b>Take it out and…</b> Without it there is nothing to clamp down — the whole arm becomes a loose chain on the table.</p>
+  
+</article><article class="part" id="part-base_motor_holder_so101_v1" data-part="base_motor_holder_so101_v1">
+  <h4>Base motor holder <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 13 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> A cradle inside the base that grips the shoulder-pan servo body with four small screws.</p>
+  <p><b>Why it is there.</b> Servos have no mounting flange of their own; every servo in this arm sits in a printed cradle like this one.</p>
+  <ul class="spec"><li><b>Print volume:</b> 24 cm³ solid</li><li><b>Triangles in CAD:</b> 37,540</li></ul>
+  
+  <p><b>Take it out and…</b> The first servo would rattle loose in the base and the whole arm would wobble on its axis.</p>
+  
+</article><article class="part" id="part-motor_holder_so101_base_v1" data-part="motor_holder_so101_base_v1">
+  <h4>Shoulder motor holder <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 7 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> Cradle for the shoulder-lift servo. It bolts onto the output horn of the servo below, so it turns when the base servo turns.</p>
+  <p><b>Why it is there.</b> This is where rotation about the vertical axis is passed upward: the holder is the first moving part.</p>
+  <ul class="spec"><li><b>Print volume:</b> 13 cm³ solid</li><li><b>Triangles in CAD:</b> 22,586</li></ul>
+  
+  <p><b>Take it out and…</b> The shoulder-lift servo has nothing to sit in; the arm above the base falls off.</p>
+  
+</article><article class="part" id="part-rotation_pitch_so101_v1" data-part="rotation_pitch_so101_v1">
+  <h4>Shoulder pitch bracket <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 38 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> The bracket that turns the shoulder-lift servo output into a pivot for the upper arm.</p>
+  <p><b>Why it is there.</b> It carries the highest load in the whole arm — the weight of everything from the upper arm outward — so it is one of the chunkier prints.</p>
+  <ul class="spec"><li><b>Print volume:</b> 69 cm³ solid</li><li><b>Triangles in CAD:</b> 17,672</li></ul>
+  
+  <p><b>Take it out and…</b> The upper arm loses its pivot and drops.</p>
+  
+</article><article class="part" id="part-upper_arm_so101_v1" data-part="upper_arm_so101_v1">
+  <h4>Upper arm <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 66 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> The long link between shoulder and elbow. The elbow servo sits in a pocket at its far end.</p>
+  <p><b>Why it is there.</b> Its length sets the arm&#x27;s reach. Make it longer and the arm reaches further but every joint needs more torque to hold it up.</p>
+  <ul class="spec"><li><b>Print volume:</b> 117 cm³ solid</li><li><b>Triangles in CAD:</b> 26,068</li></ul>
+  
+  <p><b>Take it out and…</b> No connection between shoulder and elbow — the arm ends at the shoulder.</p>
+  
+</article><article class="part" id="part-under_arm_so101_v1" data-part="under_arm_so101_v1">
+  <h4>Lower arm <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 52 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> The forearm link from elbow to wrist. Hollow to save weight, with the wrist-flex servo pocket at the end.</p>
+  <p><b>Why it is there.</b> Weight out here costs the most torque at the shoulder, which is why it is the most hollowed-out part.</p>
+  <ul class="spec"><li><b>Print volume:</b> 93 cm³ solid</li><li><b>Triangles in CAD:</b> 39,516</li></ul>
+  
+  <p><b>Take it out and…</b> Elbow to wrist connection gone; the wrist and gripper fall away.</p>
+  
+</article><article class="part" id="part-motor_holder_so101_wrist_v1" data-part="motor_holder_so101_wrist_v1">
+  <h4>Wrist motor holder <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 8 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> Cradle that clamps the wrist-flex servo into the end of the lower arm.</p>
+  <p><b>Why it is there.</b> The wrist servo bears sideways loads when the gripper twists; this cradle holds its body so the gears do not.</p>
+  <ul class="spec"><li><b>Print volume:</b> 14 cm³ solid</li><li><b>Triangles in CAD:</b> 21,042</li></ul>
+  
+  <p><b>Take it out and…</b> The wrist-flex servo would slide out of the forearm.</p>
+  
+</article><article class="part" id="part-wrist_roll_pitch_so101_v2" data-part="wrist_roll_pitch_so101_v2">
+  <h4>Wrist <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 18 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> The wrist block. It is driven by the wrist-flex servo and carries the wrist-roll servo (the one without a horn) pointing along the arm.</p>
+  <p><b>Why it is there.</b> Two axes meet here: flex (up/down) and roll (twist). Packing both into 6 cm is why this is the most detailed print.</p>
+  <ul class="spec"><li><b>Print volume:</b> 32 cm³ solid</li><li><b>Triangles in CAD:</b> 53,994</li></ul>
+  
+  <p><b>Take it out and…</b> No wrist — the gripper cannot tilt or twist, it just points where the forearm points.</p>
+  
+</article><article class="part" id="part-wrist_roll_follower_so101_v1" data-part="wrist_roll_follower_so101_v1">
+  <h4>Gripper body (fixed jaw) <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 32 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> The gripper housing and the fixed finger. It bolts to the wrist-roll servo horn and holds the gripper servo.</p>
+  <p><b>Why it is there.</b> The fixed jaw is the anvil; the moving jaw closes against it. Rolling this whole block is what lets the gripper approach objects from any angle.</p>
+  <ul class="spec"><li><b>Print volume:</b> 57 cm³ solid</li><li><b>Triangles in CAD:</b> 28,796</li></ul>
+  
+  <p><b>Take it out and…</b> No fixed finger — the moving jaw has nothing to squeeze against, so it cannot hold anything.</p>
+  
+</article><article class="part" id="part-moving_jaw_so101_v1" data-part="moving_jaw_so101_v1">
+  <h4>Moving jaw <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 12 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> The finger that opens and closes. It is bolted straight to the gripper servo horn.</p>
+  <p><b>Why it is there.</b> Servo-driven jaw means grip force is set in software by limiting the servo&#x27;s load — good for not crushing things.</p>
+  <ul class="spec"><li><b>Print volume:</b> 21 cm³ solid</li><li><b>Triangles in CAD:</b> 28,270</li></ul>
+  
+  <p><b>Take it out and…</b> The gripper cannot close.</p>
+  
+</article><article class="part" id="part-waveshare_mounting_plate_so101_v2" data-part="waveshare_mounting_plate_so101_v2">
+  <h4>Control board mounting plate <span class="qty">× 1</span></h4>
+  <p class="meta">PLA+ plastic, FDM 3D-printed, 20% infill · ≈ 5 g each · included in the ~$25 print cost for the whole arm</p>
+  <p><b>What it is.</b> A small printed plate that fastens the Waveshare servo driver board to the side of the base.</p>
+  <p><b>Why it is there.</b> Keeps the board and its USB/power connectors fixed so cables are not yanked when the arm moves.</p>
+  <ul class="spec"><li><b>Print volume:</b> 9 cm³ solid</li><li><b>Triangles in CAD:</b> 1,254</li></ul>
+  
+  <p><b>Take it out and…</b> The driver board dangles on its cables; nothing else changes.</p>
+  
+</article><h3 id="fastener">Fasteners</h3><article class="part" id="part-servo_screws" data-part="servo_screws">
+  <h4>Servo screws (ship with the servos) <span class="qty">× 6</span></h4>
+  <p class="meta">Steel · ≈ 6 g each · included</p>
+  <p><b>What it is.</b> Each servo comes with a bag: small self-tapping screws for its body, screws for the horn, and a centre screw that locks the horn to the shaft.</p>
+  <p><b>Why it is there.</b> Every printed part attaches with these. No glue, no nuts — screws bite straight into the plastic.</p>
+  <ul class="spec"><li><b>Body screws:</b> small self-tapping, 4 per servo</li><li><b>Horn screws:</b> attach printed brackets to the splined horn</li><li><b>Centre screw:</b> one per horn, locks it to the shaft</li></ul>
+  
+  <p><b>Take it out and…</b> Parts separate under load. Losing the centre screw is the classic failure: the horn slips and the joint reads the wrong angle.</p>
+  
+</article><h3 id="tool">Tools & mounting</h3><article class="part" id="part-table_clamp" data-part="table_clamp">
+  <h4>Table clamps <span class="qty">× 2</span></h4>
+  <p class="meta">Steel/plastic · ≈ 150 g each · $5.00 each</p>
+  <p><b>What it is.</b> Woodworking clamps that pin the base to the table edge.</p>
+  <p><b>Why it is there.</b> The arm weighs about 600 g but can lever itself over when extended; the clamp is what lets it push and pull on things.</p>
+  
+  
+  <p><b>Take it out and…</b> The arm walks itself off the table the first time it reaches out.</p>
+  <p><a href="https://www.amazon.com/Mr-Pen-Carpenter-Clamp-6inch/dp/B092L925J4/" rel="nofollow noopener" target="_blank">Where to buy →</a></p>
+</article>
+    <h2>Questions people ask</h2>
+    <details><summary>How much does it cost to build the SO-ARM101?</summary><p>About $146 for one follower arm: six STS3215 servos (~$83), the driver board ($10.60), power supply, cable, clamps and roughly $25 of 3D printing. A leader arm for teleoperation roughly doubles it.</p></details><details><summary>How strong is the SO-ARM101?</summary><p>Each STS3215 servo stalls at about 1.6 N·m (16.5 kg·cm) at 6 V. With a 45 cm reach the arm lifts roughly 200–300 g at full extension; the 12 V servo variant nearly doubles that.</p></details><details><summary>How many parts are in it?</summary><p>11 3D-printed parts, 6 servos, 1 driver board, 6 bus cables and the screws that ship with the servos.</p></details><details><summary>Is it really open source?</summary><p>Yes — the CAD, STL and STEP files, URDF, and bill of materials are published under Apache-2.0 by The Robot Studio. This explorer uses those files unchanged apart from mesh simplification.</p></details><details><summary>Can I change parts here?</summary><p>Yes. Click any part to read about it, hide it to see what it was holding, pull the exploded-view slider to separate the assembly, and move every joint with the sliders.</p></details>
+    <p class="cta">Want to design your own arm and test whether its motors can lift the load? <a href="/app/">Open Adem Forge</a> — free robot design software in your browser.</p>
+  </section>
+</main>
+<footer><span>© 2026 Adem · SO-ARM101 by The Robot Studio, Apache-2.0 · meshes simplified for the web</span><a href="mailto:hello@ademvnion.com">hello@ademvnion.com</a></footer>
+</body>
+</html>

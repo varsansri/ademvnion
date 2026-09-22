@@ -40,6 +40,7 @@ export default function App() {
         <a className="brand" href="/"><span className="mark">A</span> Adem <em>Forge</em></a>
         <span className="tagline">Robot design software in your browser — build, set the numbers, run.</span>
         <span className="grow" />
+        <a className="mini" href="/inside/so-arm101/">Inside a real robot</a>
         <button className="mini" onClick={() => setShowXml(true)}>View MJCF</button>
         <button className="mini" onClick={download}>Download .xml</button>
       </header>
