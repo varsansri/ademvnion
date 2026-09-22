@@ -4,6 +4,7 @@ const OUT = process.argv[2] || '.'
 const base = process.argv[3] || 'http://localhost:8766'
 const browser = await puppeteer.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true, args: ['--disable-gpu', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
 const page = await browser.newPage(); await page.setViewport({ width: 1400, height: 1000 })
+page.setDefaultNavigationTimeout(90000)   // the live site over the network, not localhost
 const errs = []; page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type() === 'error') errs.push(m.text()) }); page.on('requestfailed', r => errs.push('REQFAIL ' + r.url()))
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
