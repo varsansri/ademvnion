@@ -14,13 +14,15 @@ export default function Verdict() {
   const setCtrl = useStore(s => s.setCtrl)
   const driveOn = useStore(s => s.driveOn)
   const peaks = useRef<number[]>([])
+  const fellAt = useRef<number | null>(null)
   const [, bump] = useState(0)
 
   useEffect(() => {
     if (!frame) return
     const p = peaks.current
     if (p.length !== frame.force.length) { p.length = 0; for (let i = 0; i < frame.force.length; i++) p.push(0) }
-    if (frame.time === 0) p.fill(0)
+    if (frame.time === 0) { p.fill(0); fellAt.current = null }
+    if (fellAt.current === null && frame.rootUp < 0.3 && frame.time > 0.2 && useStore.getState().build.mount === 'free') fellAt.current = frame.time
     // Ignore the first 0.3 s: position motors jolt to their targets on start-up.
     if (frame.time > 0.3) for (let i = 0; i < frame.force.length; i++) p[i] = Math.max(p[i], Math.abs(frame.force[i]))
     bump(x => x + 1)
@@ -36,14 +38,14 @@ export default function Verdict() {
   if (!frame) return <div className="verdict"><p className="hint">Press Run to see how it performs.</p></div>
 
   const mass = totalMass(build.root)
-  const fell = build.mount === 'free' && frame.rootUp < 0.3 && frame.time > 0.2
+  const fell = build.mount === 'free' && (fellAt.current !== null || (frame.rootUp < 0.3 && frame.time > 0.2))
   const overs = actuators.filter((a, i) => peaks.current[i] >= a.maxForce * 0.98).length
   const height = frame.rootPos[2]
   const task = build.task ?? { kind: 'none' as const }
   let taskLine: { text: string; done: boolean } | null = null
   if (task.kind === 'lift') taskLine = { text: `Box: ${(frame.payloadZ).toFixed(2)} m high (best ${frame.maxPayloadZ.toFixed(2)}) — goal ${task.height} m`, done: frame.maxPayloadZ >= task.height }
   else if (task.kind === 'travel') taskLine = { text: `Travelled ${frame.travel.toFixed(2)} m of ${task.distance} m`, done: frame.travel >= task.distance }
-  else if (task.kind === 'stand') taskLine = fell ? { text: `Fell over at ${frame.time.toFixed(1)} s — needed ${task.seconds} s`, done: false } : { text: `Upright for ${Math.min(frame.time, task.seconds).toFixed(1)} of ${task.seconds} s`, done: frame.time >= task.seconds }
+  else if (task.kind === 'stand') taskLine = fell ? { text: `Fell over at ${(fellAt.current ?? frame.time).toFixed(1)} s — needed ${task.seconds} s`, done: false } : { text: `Upright for ${Math.min(frame.time, task.seconds).toFixed(1)} of ${task.seconds} s`, done: frame.time >= task.seconds }
 
   return (
     <div className="verdict">
