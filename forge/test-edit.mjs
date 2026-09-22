@@ -1,0 +1,35 @@
+import puppeteer from 'puppeteer-core'
+const browser = await puppeteer.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true, args: ['--disable-gpu','--use-angle=swiftshader','--enable-unsafe-swiftshader'] })
+const page = await browser.newPage(); await page.setViewport({ width: 1400, height: 900 })
+const errs = []; page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type()==='error' && !m.text().includes('404')) errs.push(m.text()) })
+await page.goto('http://localhost:8766/app/', { waitUntil: 'load' })
+await page.waitForFunction(() => !document.body.innerText.includes('Loading physics engine'), { timeout: 30000 })
+// Rover drives?
+await page.select('.panel-head select', 'rover'); await new Promise(r => setTimeout(r, 600))
+await page.click('button.primary'); await new Promise(r => setTimeout(r, 3000))
+const h = await page.evaluate(() => document.querySelector('.verdict')?.innerText.match(/HEIGHT\s*\|?\s*([\d.]+)/)?.[1])
+// read root x via a hidden hook: use the MJCF download? simpler: read the flag text + assume movement via contacts; instead expose store on window in dev? Not present, so check the camera-independent signal: energy grew
+const energy = await page.evaluate(() => parseFloat(document.querySelector('.verdict')?.innerText.match(/ENERGY\s*\|?\s*([\d.]+)/)?.[1] || '0'))
+console.log('rover height', h, 'energy after 3s', energy)
+// Edit: reset, select "chassis", change mass field -> total mass changes and model reloads without error
+await page.click('button[title^="Back to the starting pose"]'); await new Promise(r => setTimeout(r, 400))
+await page.evaluate(() => [...document.querySelectorAll('.tree .node')].find(n => n.textContent.includes('chassis')).click())
+await new Promise(r => setTimeout(r, 300))
+const massInput = await page.$('.shape input[type=number][step="0.05"]')
+await massInput.click({ clickCount: 3 }); await massInput.type('9'); await new Promise(r => setTimeout(r, 600))
+await page.evaluate(() => [...document.querySelectorAll('.tree .node')].find(n => n.textContent.includes('Rover')).click())
+await new Promise(r => setTimeout(r, 300))
+const total = await page.evaluate(() => document.querySelector('.inspector')?.innerText.match(/Total mass:\s*([\d.]+)/)?.[1])
+console.log('total mass after edit', total, '(expected 9 + 0.5 + 4*0.3 = 10.7)')
+// Add a child part via + button, check tree grows and no load error
+await page.evaluate(() => [...document.querySelectorAll('.tree .node')].find(n => n.textContent.includes('chassis')).querySelector('.actions button').click())
+await new Promise(r => setTimeout(r, 600))
+const nodes = await page.evaluate(() => document.querySelectorAll('.tree .node').length)
+const err = await page.evaluate(() => document.querySelector('.verdict.error')?.innerText || 'no load error')
+console.log('tree nodes', nodes, '|', err)
+// Bad input: mass 0 -> should show a load error not crash
+const m2 = await page.$('.shape input[type=number][step="0.05"]')
+await m2.click({ clickCount: 3 }); await m2.type('0'); await new Promise(r => setTimeout(r, 600))
+console.log('after mass 0:', await page.evaluate(() => (document.querySelector('.verdict')?.innerText || '').slice(0, 120).replace(/\n/g,' | ')))
+console.log('page errors:', errs.length ? errs : 'none')
+await browser.close()
