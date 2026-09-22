@@ -7,6 +7,7 @@
 <script defer src="https://cloud.umami.is/script.js" data-website-id="473ac96b-268f-4710-9840-e8f27f67fac9"></script>
 <link rel="icon" href="/img/favicon.png" sizes="64x64">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="modulepreload" href="/hero/hero.js">
 <link rel="preload" as="image" href="/img/imago-dei.webp" imagesrcset="/img/imago-dei-800.webp 800w, /img/imago-dei.webp 1400w" imagesizes="min(1180px, 100vw)">
 <title>Ademvnion — Human, enhanced</title>
 <meta name="description" content="Adem is building Vnion: wearable human enhancement. Sharper sight, sharper hearing, clean air, a private AI — worn openly, not hidden. Very early stage.">
@@ -79,16 +80,21 @@
   .armhero{margin:clamp(22px,4vw,44px) auto 0;width:min(640px,92vw);position:relative}
   .armhero .glow{position:absolute;inset:6% 8% 14%;background:radial-gradient(closest-side,rgba(125,211,252,.16),transparent);filter:blur(34px);z-index:-1}
   .armhero .stage{width:100%;aspect-ratio:1/0.68;position:relative}
+  /* A still of the same opening pose holds the space, and only fades once the
+     real canvas has faded in, so the swap is not a blink of empty page. */
+  .armhero .poster{position:absolute;inset:0;background:url(/img/arm-poster.webp) center/contain no-repeat;
+    transition:opacity .5s .2s;pointer-events:none}   /* it covers the canvas: never take its clicks */
+  .armhero.ready .poster{opacity:0}
   .armhero .stage canvas{width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab;opacity:0;transition:opacity .6s}
   .armhero.ready .stage canvas{opacity:1}
-  .armhero .loading{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;color:var(--muted);transition:opacity .4s}
-  .armhero.ready .loading,.armhero.failed .loading{opacity:0;pointer-events:none}
   .armhint{margin-top:2px;font-size:14px;color:var(--muted);transition:opacity .5s}
   .armhero.touched .armhint{opacity:0}
   .armcap{margin:10px auto 0;max-width:600px;font-size:13.5px;color:var(--muted)}
   .armcap a{color:var(--fg);border-bottom:1px solid var(--line)}
   .armcap a:hover{border-color:var(--muted)}
-  .armhero.failed .stage{display:none}
+  /* If the viewer cannot load, the still stays: it is a perfectly good
+     picture of the arm, and only the invitation to drag it is wrong. */
+  .armhero.failed .armhint{display:none}
 
   section{padding:clamp(56px,9vw,110px) 0;border-top:1px solid var(--line)}
   .kicker{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
@@ -187,7 +193,7 @@
 
     <div class="armhero" id="armhero">
       <div class="glow" aria-hidden="true"></div>
-      <div class="stage" id="armstage"><div class="loading">Loading the arm&hellip;</div></div>
+      <div class="stage" id="armstage"><div class="poster" aria-hidden="true"></div></div>
       <p class="armhint" id="armhint">Drag a part to move that joint &middot; drag the background to spin it around</p>
       <p class="armcap">SO-ARM101 &mdash; a real open-source robot arm: six motors, every joint limit straight from its CAD. <a href="/inside/so-arm101/">See every part inside &rarr;</a></p>
     </div>
@@ -363,23 +369,30 @@
 </footer>
 
 <script>
-// The 3D viewer is ~180 KB gzipped: it must never delay the hero text.
+// Getting the arm on screen quickly is three downloads, not one: this module,
+// the part data and the mesh file. Left alone they happen one after another,
+// and only once the page has finished loading. So the two data files start
+// here, in parallel with the module, and the module itself starts as soon as
+// the document is parsed rather than after every image.
 (function () {
   var el = document.getElementById('armhero');
   if (!el || !window.IntersectionObserver) return;
+  var DIR = '/inside/so-arm101/';
   var started = false;
   function start() {
     if (started) return;
     started = true;
+    try {
+      window.__armWarm = {
+        data: fetch(DIR + 'data.json').then(function (r) { return r.json(); }),
+        glb: fetch(DIR + 'so101.glb').then(function (r) { return r.arrayBuffer(); })
+      };
+    } catch (e) { /* the module falls back to fetching them itself */ }
     import('/hero/hero.js').catch(function (e) { console.error(e); el.classList.add('failed'); });
   }
-  function whenLoaded() {
-    if (document.readyState === 'complete') start();
-    else addEventListener('load', start, { once: true });
-  }
   var io = new IntersectionObserver(function (es) {
-    if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); whenLoaded(); }
-  }, { rootMargin: '300px' });
+    if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+  }, { rootMargin: '600px' });
   io.observe(el);
 })();
 </script>

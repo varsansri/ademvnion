@@ -28,12 +28,21 @@ const IDLE: Record<string, [number, number, number, number]> = {
   gripper: [0.7, 0.6, 0.33, 0],
 }
 
+// Where in the sway the arm opens. At t=0 it is folded in on itself and reads
+// as a blob; here it is reaching, and reads as an arm. img/arm-poster.webp is
+// this exact pose, so the still and the live arm line up.
+const OPEN_AT = 6.8
+
 const root = document.getElementById('armhero')
 const stage = document.getElementById('armstage')
 if (root && stage) main(root, stage).catch(err => { console.error(err); root.classList.add('failed') })
 
 async function main(root: HTMLElement, stage: HTMLElement) {
-  const data: Data = await (await fetch(DIR + 'data.json')).json()
+  // index.html starts fetching these the moment the page parses, so by the
+  // time this module has compiled they are usually already in hand. Falling
+  // back to a plain fetch keeps the module usable on its own.
+  const warm = (window as any).__armWarm as { data?: Promise<Data>; glb?: Promise<ArrayBuffer> } | undefined
+  const data: Data = await (warm?.data ?? fetch(DIR + 'data.json').then(r => r.json()))
   const cat = new Map(data.parts.map(p => [p.id, p.category]))
 
   const small = matchMedia('(max-width: 900px)').matches
@@ -105,7 +114,7 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   // --- visuals: one meshopt file for the whole arm, geometry by node name ---
   const loader = new GLTFLoader()
   loader.setMeshoptDecoder(MeshoptDecoder)
-  const pack = await loader.loadAsync(DIR + 'so101.glb')
+  const pack = warm?.glb ? await loader.parseAsync(await warm.glb, DIR) : await loader.loadAsync(DIR + 'so101.glb')
   const geos = new Map<string, THREE.BufferGeometry>()
   pack.scene.updateMatrixWorld(true)
   pack.scene.traverse(o => {
@@ -175,7 +184,7 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   const fit = () => {
     const keep = { ...q }
     const box = new THREE.Box3()
-    for (let t = 0; t < 240; t += 0.8) {   // the whole sway, not its extreme corners
+    for (let t = 0; t < 240; t += 3) {     // the whole sway, not its extreme corners
       poseAt(t)
       applyJoints()
       scene.updateMatrixWorld(true)
@@ -283,7 +292,7 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   renderer.setAnimationLoop(() => {
     if (!visible) return
     if (idle) {
-      poseAt((performance.now() - t0) / 1000)
+      poseAt(OPEN_AT + (performance.now() - t0) / 1000)
       applyJoints()
       dirty = true
     }
@@ -294,6 +303,6 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   })
 
   // Tests drive the hero through this (same idea as window.__forge).
-  ;(window as any).__arm = { q, jointGroups, meshes, camera, controls, applyJoints }
+  ;(window as any).__arm = { q, jointGroups, meshes, camera, controls, applyJoints, poseAt, invalidate }
   root.classList.add('ready')
 }
