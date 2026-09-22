@@ -69,23 +69,72 @@ save(art.resize((800, round(800 * art.height / art.width)), Image.LANCZOS), 'ima
 cloud = trim(ink(Image.open(os.path.join(SRC, '1145532855458404194.jpg')), floor=8, gain=1.55))
 save(cloud, 'cloud.webp', quality=86)
 
-# 3. The logo: an eye in a daisy, given the same ink treatment as the rest so
-# it sits in the dark header with no chip or box around it. The icons need the
-# background baked in, because a browser tab may be any colour.
+# 3. The logo: an eye in a daisy, cut out of its paper.
+#
+# The scan is a drawing on white paper. Everything else here gets inverted to
+# live on a dark page, but the logo must not: it has to read on a dark header
+# AND on Google's white results page, and inverting the eye turns the pupil
+# into a white blob. So the paper is flood-filled away from the border and the
+# artwork is kept exactly as drawn — light petals with dark outlines, which
+# show up against either background.
+from PIL import ImageDraw, ImageFilter, ImageEnhance
+
+
+def cutout(img, thresh=42, feather=0.7):
+    """Remove the paper, keep the drawing. Fills inward from every border pixel,
+    so enclosed light areas inside the petals survive."""
+    work = img.convert('L')
+    w, h = work.size
+    edges = [(x, y) for x in range(0, w, 6) for y in (0, h - 1)]
+    edges += [(x, y) for y in range(0, h, 6) for x in (0, w - 1)]
+    for pt in edges:
+        if work.getpixel(pt) >= 200:
+            ImageDraw.floodfill(work, pt, 0, thresh=thresh)
+    mask = Image.fromarray((np.asarray(work) != 0).astype(np.uint8) * 255)
+    out = img.convert('RGBA')
+    out.putalpha(mask.filter(ImageFilter.GaussianBlur(feather)))
+    return trim(out)
+
+
 logo_src = next(f for f in os.listdir(SRC) if f.endswith('.jpg') and not f[0].isascii()
                 and Image.open(os.path.join(SRC, f)).size == (736, 736))
-src = Image.open(os.path.join(SRC, logo_src))
-mark = trim(ink(src, floor=10, gain=1.2))
-save(mark.resize((256, round(256 * mark.height / mark.width)), Image.LANCZOS), 'logo.webp', quality=88, alpha_quality=80)
+mark = cutout(Image.open(os.path.join(SRC, logo_src)))
+side = max(mark.size)
+sq = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+sq.paste(mark, ((side - mark.width) // 2, (side - mark.height) // 2), mark)
 
-for size, name, pad in ((180, 'apple-touch-icon.png', 0.14), (64, 'favicon.png', 0.08)):
-    icon = Image.new('RGBA', (size, size), (7, 8, 11, 255))
-    inner = round(size * (1 - pad * 2))
-    m = mark.resize((inner, round(inner * mark.height / mark.width)), Image.LANCZOS)
-    icon.alpha_composite(m, ((size - m.width) // 2, (size - m.height) // 2))
+# logo.png is the file to hand anyone who asks for the logo. The site itself
+# uses the WebP, because halftone noise makes a PNG of this several times
+# larger for no visible gain.
+for size, name in ((512, 'logo.png'), (256, 'logo-256.png')):
+    im = sq.resize((size, size), Image.LANCZOS)
     p = os.path.join(OUT, name)
-    icon.save(p)
-    print(name, icon.size, f'{os.path.getsize(p) / 1024:.0f} KB')
+    im.save(p)
+    print(name, im.size, f'{os.path.getsize(p) / 1024:.0f} KB')
+for size, name in ((256, 'logo.webp'), (80, 'logo-80.webp')):
+    im = sq.resize((size, size), Image.LANCZOS)
+    p = os.path.join(OUT, name)
+    im.save(p, quality=86, alpha_quality=90, method=6)
+    print(name, im.size, f'{os.path.getsize(p) / 1024:.0f} KB')
+
+# Icons. Google asks for a square that is a multiple of 48. Small sizes need
+# the extra contrast or the halftone turns to grey mush.
+punchy = ImageEnhance.Contrast(sq).enhance(1.55)
+for size in (48, 96, 144, 192, 512):
+    im = punchy.resize((size, size), Image.LANCZOS)
+    p = os.path.join(OUT, f'icon-{size}.png')
+    im.save(p)
+print('icon-48/96/144/192/512.png')
+punchy.resize((64, 64), Image.LANCZOS).save(os.path.join(OUT, 'favicon.png'))
+punchy.resize((256, 256), Image.LANCZOS).save(
+    os.path.join(OUT, 'favicon.ico'), sizes=[(16, 16), (32, 32), (48, 48)])
+
+# Apple puts the home-screen icon on whatever it likes, so this one is opaque.
+touch = Image.new('RGBA', (180, 180), (7, 8, 11, 255))
+inner = punchy.resize((150, 150), Image.LANCZOS)
+touch.alpha_composite(inner, (15, 15))
+touch.save(os.path.join(OUT, 'apple-touch-icon.png'))
+print('favicon.png, favicon.ico, apple-touch-icon.png')
 
 # 4. The card other sites show when the link is shared, and what Google may
 # pick up: 1200x630. The engraving sits to the right, dimmed and under a scrim,
@@ -112,9 +161,8 @@ x = np.linspace(0, 1, 1200)
 scrim[..., 3] = np.clip((1 - x / 0.72) * 255, 0, 255)[None, :].astype(np.uint8)
 card.alpha_composite(Image.fromarray(scrim, 'RGBA'))
 
-mark = trim(ink(Image.open(os.path.join(SRC, logo_src)), floor=10, gain=1.2))
-mark = mark.resize((84, round(84 * mark.height / mark.width)), Image.LANCZOS)
-card.alpha_composite(mark, (72, 66))
+badge = sq.resize((84, 84), Image.LANCZOS)
+card.alpha_composite(badge, (72, 60))
 d = ImageDraw.Draw(card)
 d.text((174, 74), 'ADEMVNION', font=font('segoeuib.ttf', 30), fill=(238, 234, 226, 255))
 d.text((176, 114), 'wearable human enhancement', font=font('segoeui.ttf', 20), fill=(150, 156, 170, 255))

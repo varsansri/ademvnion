@@ -37,7 +37,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="top">
-        <a className="brand" href="/"><span className="mark">A</span> Adem <em>Forge</em></a>
+        <a className="brand" href="/"><img className="mark" src="/img/logo-80.webp" width="24" height="24" alt="" /> Adem <em>Forge</em></a>
         <span className="tagline">Robot design software in your browser — build, set the numbers, run.</span>
         <span className="grow" />
         <a className="mini" href="/inside/so-arm101/">Inside a real robot</a>
