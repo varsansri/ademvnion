@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { useStore } from '../store'
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js'
+import { hotBodies, useStore } from '../store'
 import type { GeomInfo } from '../sim/protocol'
+import { findParent } from '../model/types'
 
 // mjtGeom
 const PLANE = 0, SPHERE = 2, CAPSULE = 3, CYLINDER = 5, BOX = 6
@@ -10,7 +12,7 @@ const PLANE = 0, SPHERE = 2, CAPSULE = 3, CYLINDER = 5, BOX = 6
 function geometryFor(g: GeomInfo, i: number): THREE.BufferGeometry | null {
   const t = g.type[i], s0 = g.size[i * 3], s1 = g.size[i * 3 + 1], s2 = g.size[i * 3 + 2]
   switch (t) {
-    case PLANE: return null // drawn separately as the grid floor
+    case PLANE: return null
     case SPHERE: return new THREE.SphereGeometry(s0, 24, 16)
     case BOX: return new THREE.BoxGeometry(s0 * 2, s1 * 2, s2 * 2)
     case CYLINDER: { const geo = new THREE.CylinderGeometry(s0, s0, s1 * 2, 32); geo.rotateX(Math.PI / 2); return geo }
@@ -19,13 +21,18 @@ function geometryFor(g: GeomInfo, i: number): THREE.BufferGeometry | null {
   }
 }
 
+const HOT = new THREE.Color('#f87171')
+const SEL = new THREE.Color('#7dd3fc')
+
 export default function Viewport() {
   const host = useRef<HTMLDivElement>(null)
   const meshes = useRef<(THREE.Mesh | null)[]>([])
   const scene = useRef<THREE.Scene | null>(null)
+  const gizmo = useRef<TransformControls | null>(null)
+  const handle = useRef<THREE.Object3D | null>(null)
+  const dragging = useRef(false)
   const geoms = useStore(s => s.geoms)
 
-  // Scene setup once.
   useEffect(() => {
     const el = host.current!
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' })
@@ -70,10 +77,84 @@ export default function Viewport() {
     grid.position.z = 0.001
     sc.add(grid)
 
+    // Lift-task target: a ring at the goal height above the payload.
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.12, 0.135, 48), new THREE.MeshBasicMaterial({ color: '#fbbf24', transparent: true, opacity: 0.8, side: THREE.DoubleSide }))
+    ring.visible = false
+    sc.add(ring)
+
+    // Drag handle for the selected part.
+    const h = new THREE.Object3D()
+    sc.add(h)
+    handle.current = h
+    const tc = new TransformControls(camera, renderer.domElement)
+    tc.setSize(0.8)
+    tc.attach(h)
+    tc.enabled = false
+    const tcHelper = tc.getHelper()
+    tcHelper.visible = false
+    sc.add(tcHelper)
+    gizmo.current = tc
+    tc.addEventListener('dragging-changed', (e: { value: unknown }) => {
+      dragging.current = !!e.value
+      controls.enabled = !e.value
+      if (!e.value) commitDrag()
+    })
+    let lastLive = 0
+    tc.addEventListener('objectChange', () => {
+      // Live preview while dragging, but rebuild the model at most 10x/s.
+      const now = performance.now()
+      if (dragging.current && now - lastLive > 100) { lastLive = now; commitDrag(true) }
+    })
+
+    const commitDrag = (live = false) => {
+      const st = useStore.getState()
+      const sel = st.selectedId; const f = st.frame
+      if (!sel || !f) return
+      const myId = st.bodyIds[sel]
+      const parent = findParent(st.build.root, sel)
+      const pid = parent ? st.bodyIds[parent.id] : 0
+      if (myId === undefined) return
+      // New world position of the handle -> parent-local offset (R_parent^T * (p - p_parent)).
+      const p = h.position
+      let lx = p.x, ly = p.y, lz = p.z
+      if (pid > 0) {
+        const px = f.bodyPos[pid * 3], py = f.bodyPos[pid * 3 + 1], pz = f.bodyPos[pid * 3 + 2]
+        const r = pid * 9, m = f.bodyMat
+        const dx = p.x - px, dy = p.y - py, dz = p.z - pz
+        lx = m[r] * dx + m[r + 3] * dy + m[r + 6] * dz
+        ly = m[r + 1] * dx + m[r + 4] * dy + m[r + 7] * dz
+        lz = m[r + 2] * dx + m[r + 5] * dy + m[r + 8] * dz
+      }
+      const round = (v: number) => Math.round(v * 200) / 200 // 5 mm snap
+      void live
+      st.updateBody(sel, { pos: [round(lx), round(ly), round(lz)] })
+    }
+
+    // Click to select a part (ignore drags that moved the camera).
+    const ray = new THREE.Raycaster()
+    let downAt = [0, 0]
+    const onDown = (e: PointerEvent) => { downAt = [e.clientX, e.clientY] }
+    const onUp = (e: PointerEvent) => {
+      if (dragging.current) return
+      if (Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 4) return
+      const rect = renderer.domElement.getBoundingClientRect()
+      const ndc = new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1)
+      ray.setFromCamera(ndc, camera)
+      const hits = ray.intersectObjects(meshes.current.filter((m): m is THREE.Mesh => !!m), false)
+      const st = useStore.getState()
+      if (!hits.length || !st.geoms) { st.select(null); return }
+      const gi = meshes.current.indexOf(hits[0].object as THREE.Mesh)
+      const mjBody = st.geoms.bodyId[gi]
+      const entry = Object.entries(st.bodyIds).find(([, v]) => v === mjBody)
+      st.select(entry ? entry[0] : null)
+    }
+    renderer.domElement.addEventListener('pointerdown', onDown)
+    renderer.domElement.addEventListener('pointerup', onUp)
+
     const resize = () => {
-      const w = el.clientWidth, h = el.clientHeight
-      renderer.setSize(w, h, false)
-      camera.aspect = w / Math.max(h, 1)
+      const w = el.clientWidth, hgt = el.clientHeight
+      renderer.setSize(w, hgt, false)
+      camera.aspect = w / Math.max(hgt, 1)
       camera.updateProjectionMatrix()
     }
     resize()
@@ -81,12 +162,19 @@ export default function Viewport() {
     ro.observe(el)
 
     const m4 = new THREE.Matrix4()
+    const target = new THREE.Vector3()
     let raf = 0
+    let pulse = 0
     const tick = () => {
       raf = requestAnimationFrame(tick)
-      const f = useStore.getState().frame
-      if (f) {
+      pulse += 0.08
+      const st = useStore.getState()
+      const f = st.frame
+      const hot = f && st.mode === 'run' ? hotBodies() : null
+      const selMj = st.selectedId ? st.bodyIds[st.selectedId] : -1
+      if (f && st.geoms) {
         const ms = meshes.current
+        const g = st.geoms
         for (let i = 0; i < ms.length; i++) {
           const mesh = ms[i]; if (!mesh) continue
           const p = i * 3, r = i * 9
@@ -97,7 +185,32 @@ export default function Viewport() {
             x[r + 6], x[r + 7], x[r + 8], f.xpos[p + 2],
             0, 0, 0, 1)
           mesh.matrix.copy(m4)
+          const mat = mesh.material as THREE.MeshStandardMaterial
+          const b = g.bodyId[i]
+          if (hot && hot.has(b)) { mat.emissive.copy(HOT); mat.emissiveIntensity = 0.45 + 0.35 * Math.sin(pulse * 2) }
+          else if (b === selMj && st.mode === 'edit') { mat.emissive.copy(SEL); mat.emissiveIntensity = 0.25 }
+          else { mat.emissiveIntensity = 0 }
         }
+        // Handle follows the selected body; gizmo only while editing.
+        const tc = gizmo.current!
+        const editing = st.mode === 'edit' && selMj > 0
+        tcHelper.visible = editing; tc.enabled = editing
+        if (editing && !dragging.current) h.position.set(f.bodyPos[selMj * 3], f.bodyPos[selMj * 3 + 1], f.bodyPos[selMj * 3 + 2])
+        // Camera follow for free-moving robots.
+        if (st.mode === 'run' && st.follow && st.build.mount === 'free' && f.running) {
+          target.set(f.rootPos[0], f.rootPos[1], Math.max(f.rootPos[2] * 0.6, 0.15))
+          const delta = target.clone().sub(controls.target)
+          controls.target.addScaledVector(delta, 0.06)
+          camera.position.addScaledVector(delta, 0.06)
+        }
+        // Lift target ring.
+        const t = st.build.task
+        if (t && t.kind === 'lift') {
+          ring.visible = true
+          ring.position.set(t.pos[0], t.pos[1], t.height)
+          const done = f.maxPayloadZ >= t.height
+          ;(ring.material as THREE.MeshBasicMaterial).color.set(done ? '#4ade80' : '#fbbf24')
+        } else ring.visible = false
       }
       controls.update()
       renderer.render(sc, camera)
@@ -107,13 +220,15 @@ export default function Viewport() {
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      renderer.domElement.removeEventListener('pointerdown', onDown)
+      renderer.domElement.removeEventListener('pointerup', onUp)
+      tc.dispose()
       controls.dispose()
       renderer.dispose()
       el.removeChild(renderer.domElement)
     }
   }, [])
 
-  // Rebuild meshes whenever the model changes.
   useEffect(() => {
     const sc = scene.current
     if (!sc) return
@@ -125,7 +240,7 @@ export default function Viewport() {
       const geo = geometryFor(geoms, i)
       if (!geo) { list.push(null); continue }
       const c = new THREE.Color(geoms.rgba[i * 4], geoms.rgba[i * 4 + 1], geoms.rgba[i * 4 + 2])
-      const mat = new THREE.MeshStandardMaterial({ color: c, roughness: 0.55, metalness: 0.15 })
+      const mat = new THREE.MeshStandardMaterial({ color: c, roughness: 0.55, metalness: 0.15, emissive: new THREE.Color('#000000'), emissiveIntensity: 0 })
       const mesh = new THREE.Mesh(geo, mat)
       mesh.castShadow = true
       mesh.receiveShadow = true

@@ -8,6 +8,7 @@ function Node({ b, depth, isRoot }: { b: Body; depth: number; isRoot: boolean })
   const select = useStore(s => s.select)
   const addChild = useStore(s => s.addChild)
   const removeBody = useStore(s => s.removeBody)
+  const duplicateBody = useStore(s => s.duplicateBody)
   const active = selected === b.id
   const j = b.joint
   const tag = isRoot ? 'root' : j ? (j.actuator === 'none' ? j.type : `${j.type} · ${j.actuator}`) : ''
@@ -19,6 +20,7 @@ function Node({ b, depth, isRoot }: { b: Body; depth: number; isRoot: boolean })
         <span className="tag">{tag}</span>
         <span className="actions">
           <button title="Add a part attached to this one" onClick={e => { e.stopPropagation(); addChild(b.id) }}>+</button>
+          {!isRoot && <button title="Mirror-copy this part (and everything attached) to the other side" onClick={e => { e.stopPropagation(); duplicateBody(b.id) }}>⧉</button>}
           {!isRoot && <button title="Remove this part and everything attached to it" onClick={e => { e.stopPropagation(); removeBody(b.id) }}>×</button>}
         </span>
       </div>
@@ -48,7 +50,7 @@ export default function Tree() {
         <span className="tag">{build.mount === 'free' ? 'free' : 'bolted down'}</span>
       </div>
       <Node b={build.root} depth={0} isRoot />
-      <p className="hint">Click a part to edit it. <b>+</b> attaches a new part with a joint. Every joint can have a motor.</p>
+      <p className="hint">Click a part here or in the 3D view. Drag the arrows to move it. <b>+</b> attaches a new part, <b>⧉</b> mirror-copies it. Ctrl+Z undoes.</p>
     </div>
   )
 }

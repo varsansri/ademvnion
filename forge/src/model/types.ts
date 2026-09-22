@@ -48,6 +48,15 @@ export interface Body {
   children: Body[]
 }
 
+export type Task =
+  | { kind: 'none' }
+  /** Lift a loose box of `mass` kg, placed at `pos`, up to `height` metres. */
+  | { kind: 'lift'; mass: number; size: number; pos: Vec3; height: number }
+  /** Move the robot's base `distance` metres from where it started. */
+  | { kind: 'travel'; distance: number }
+  /** Stay upright for `seconds`. */
+  | { kind: 'stand'; seconds: number }
+
 export interface Build {
   name: string
   root: Body
@@ -56,6 +65,7 @@ export interface Build {
   gravity: number
   timestep: number
   floorFriction: number
+  task?: Task
 }
 
 let counter = 0

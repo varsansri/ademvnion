@@ -39,6 +39,11 @@ export default function Verdict() {
   const fell = build.mount === 'free' && frame.rootUp < 0.3 && frame.time > 0.2
   const overs = actuators.filter((a, i) => peaks.current[i] >= a.maxForce * 0.98).length
   const height = frame.rootPos[2]
+  const task = build.task ?? { kind: 'none' as const }
+  let taskLine: { text: string; done: boolean } | null = null
+  if (task.kind === 'lift') taskLine = { text: `Box: ${(frame.payloadZ).toFixed(2)} m high (best ${frame.maxPayloadZ.toFixed(2)}) — goal ${task.height} m`, done: frame.maxPayloadZ >= task.height }
+  else if (task.kind === 'travel') taskLine = { text: `Travelled ${frame.travel.toFixed(2)} m of ${task.distance} m`, done: frame.travel >= task.distance }
+  else if (task.kind === 'stand') taskLine = fell ? { text: `Fell over at ${frame.time.toFixed(1)} s — needed ${task.seconds} s`, done: false } : { text: `Upright for ${Math.min(frame.time, task.seconds).toFixed(1)} of ${task.seconds} s`, done: frame.time >= task.seconds }
 
   return (
     <div className="verdict">
@@ -55,6 +60,7 @@ export default function Verdict() {
           : overs ? `${overs} motor${overs > 1 ? 's' : ''} at the limit — it wants more torque than you gave it.`
           : frame.time > 0 ? 'Standing and within limits.' : 'Ready.'}
       </div>
+      {taskLine && <div className={'flag ' + (taskLine.done ? 'ok' : 'neutral')}>{taskLine.done ? '✓ Task done — ' : '◌ '}{taskLine.text}</div>}
       {actuators.length > 0 && (
         <div className="motors">
           <h4>Motors <span className="muted">— load vs. limit (peak marked)</span></h4>

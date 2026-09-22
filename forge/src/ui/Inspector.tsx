@@ -106,6 +106,36 @@ function BodyEditor({ b, isRoot }: { b: Body; isRoot: boolean }) {
   )
 }
 
+function TaskEditor() {
+  const task = useStore(s => s.build.task) ?? { kind: 'none' as const }
+  const setTask = useStore(s => s.setTask)
+  const kind = task.kind
+  return (
+    <section>
+      <h4>Task <span className="muted">— what counts as success</span></h4>
+      <Sel label="Goal" value={kind} onChange={v => setTask(
+        v === 'lift' ? { kind: 'lift', mass: 0.5, size: 0.08, pos: [0.45, 0, 0.04], height: 0.3 }
+        : v === 'travel' ? { kind: 'travel', distance: 2 }
+        : v === 'stand' ? { kind: 'stand', seconds: 10 }
+        : { kind: 'none' })}
+        options={[{ v: 'none', l: 'Just run' }, { v: 'lift', l: 'Lift a box' }, { v: 'travel', l: 'Travel a distance' }, { v: 'stand', l: 'Stay upright' }]} />
+      {task.kind === 'lift' && (
+        <>
+          <div className="row">
+            <Num label="Box mass" unit="kg" value={task.mass} onChange={v => setTask({ ...task, mass: v })} step={0.1} min={0.01} />
+            <Num label="Box size" unit="m" value={task.size} onChange={v => setTask({ ...task, size: v })} step={0.01} min={0.02} />
+          </div>
+          <Vec label="Box position" unit="m" value={task.pos} onChange={v => setTask({ ...task, pos: v })} />
+          <Num label="Lift to height" unit="m" value={task.height} onChange={v => setTask({ ...task, height: v })} step={0.05} min={0.05} />
+          <p className="hint">The yellow box is loose. Get it above the ring and it turns green.</p>
+        </>
+      )}
+      {task.kind === 'travel' && <Num label="Distance" unit="m" value={task.distance} onChange={v => setTask({ ...task, distance: v })} step={0.5} min={0.1} />}
+      {task.kind === 'stand' && <Num label="For" unit="s" value={task.seconds} onChange={v => setTask({ ...task, seconds: v })} step={1} min={1} />}
+    </section>
+  )
+}
+
 const axisKey = (a: [number, number, number]) => (Math.abs(a[0]) > 0.5 ? 'x' : Math.abs(a[1]) > 0.5 ? 'y' : 'z')
 const axisFrom = (k: string): [number, number, number] => (k === 'x' ? [1, 0, 0] : k === 'y' ? [0, 1, 0] : [0, 0, 1])
 
@@ -132,6 +162,7 @@ export default function Inspector() {
           <Sel label="Accuracy" value={String(build.timestep)} onChange={v => updateBuild({ timestep: parseFloat(v) })}
             options={[{ v: '0.004', l: 'Fast (4 ms step)' }, { v: '0.002', l: 'Normal (2 ms step)' }, { v: '0.001', l: 'Precise (1 ms step)' }]} />
           <p className="hint">Total mass: <b>{totalMass(build.root).toFixed(2)} kg</b>. Earth gravity is 9.81, Mars is 3.71, the Moon is 1.62.</p>
+          <TaskEditor />
         </>
       )}
     </div>

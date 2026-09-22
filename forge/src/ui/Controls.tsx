@@ -4,7 +4,11 @@ export default function Controls() {
   const mode = useStore(s => s.mode)
   const frame = useStore(s => s.frame)
   const engineReady = useStore(s => s.engineReady)
-  const { run, pause, step, reset, setSpeed, setDrive } = useStore.getState()
+  const { run, pause, step, reset, setSpeed, setDrive, setFollow, undo, redo, shareLink, showToast } = useStore.getState()
+  const follow = useStore(s => s.follow)
+  const canUndo = useStore(s => s.past.length > 0)
+  const canRedo = useStore(s => s.future.length > 0)
+  const free = useStore(s => s.build.mount === 'free')
   const speed = useStore(s => s.speed)
   const driveOn = useStore(s => s.driveOn)
   const running = !!frame?.running
@@ -27,6 +31,11 @@ export default function Controls() {
             </select>
           </label>
           <label className="inline"><input type="checkbox" checked={driveOn} onChange={e => setDrive(e.target.checked)} /> Auto-drive</label>
+          {free && <label className="inline"><input type="checkbox" checked={follow} onChange={e => setFollow(e.target.checked)} /> Follow</label>}
+          <span className="sep" />
+          <button onClick={undo} disabled={!canUndo} title="Undo (Ctrl+Z)">↶</button>
+          <button onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)">↷</button>
+          <button onClick={async () => { const url = await shareLink(); try { await navigator.clipboard.writeText(url); showToast('Link copied — the whole robot is in it') } catch { showToast('Link is in the address bar') } }} title="Put this robot in a link you can send">⤴ Share</button>
           <span className="sep" />
           <span className="status">{mode === 'run' ? `t = ${(frame?.time ?? 0).toFixed(2)} s` : 'Editing — changes apply instantly'}</span>
         </>

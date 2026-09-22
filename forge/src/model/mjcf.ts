@@ -72,6 +72,18 @@ export function buildToMjcf(build: Build): { xml: string; actuators: ActuatorInf
   const rootForXml: Body = { ...build.root, pos: rootPos }
   const body = bodyXml(rootForXml, true, '    ')
 
+  // A loose payload for the lift task: a free box the robot has to pick up.
+  let payload = ''
+  const t = build.task
+  if (t && t.kind === 'lift') {
+    const h = Math.max(t.size, 0.02) / 2
+    payload = `    <body name="payload" pos="${f(t.pos[0])} ${f(t.pos[1])} ${f(Math.max(t.pos[2], h))}">
+      <freejoint name="payload_free"/>
+      <geom name="payload" type="box" size="${f(h)} ${f(h)} ${f(h)}" mass="${f(Math.max(t.mass, 0.01))}" rgba="0.98 0.75 0.14 1"/>
+    </body>`
+    bodyNames.push('payload')
+  }
+
   const actXml = actuators.map(a => {
     const lim = `ctrllimited="true" forcelimited="true" forcerange="${f(-a.maxForce)} ${f(a.maxForce)}"`
     const j = findJoint(build.root, a.joint.replace(/_joint$/, ''), names)
@@ -102,6 +114,7 @@ export function buildToMjcf(build: Build): { xml: string; actuators: ActuatorInf
     <light pos="0 0 3" dir="0 0 -1" diffuse="0.9 0.9 0.9"/>
     <geom name="floor" type="plane" size="20 20 0.1" rgba="0.16 0.18 0.22 1"/>
 ${body}
+${payload}
   </worldbody>
   <actuator>
 ${actXml}

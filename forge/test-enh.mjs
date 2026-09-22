@@ -1,0 +1,47 @@
+import puppeteer from 'puppeteer-core'
+const OUT = process.argv[2] || '.'
+const browser = await puppeteer.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true, args: ['--disable-gpu','--use-angle=swiftshader','--enable-unsafe-swiftshader'] })
+const page = await browser.newPage(); await page.setViewport({ width: 1400, height: 900 })
+const errs = []; page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type()==='error' && !m.text().includes('404')) errs.push(m.text()) })
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+const ready = async () => page.waitForFunction(() => !document.body.innerText.includes('Loading physics engine'), { timeout: 30000 })
+const flags = () => page.evaluate(() => [...document.querySelectorAll('.verdict .flag')].map(f => f.innerText).join(' || '))
+await page.goto('http://localhost:8766/app/', { waitUntil: 'load' }); await ready(); await sleep(500)
+// undo via keyboard after a rename
+await page.evaluate(() => __forge.getState().updateBuild({ name: 'Renamed' })); await sleep(1000)
+await page.click('.viewport'); await page.keyboard.down('Control'); await page.keyboard.press('z'); await page.keyboard.up('Control'); await sleep(300)
+console.log('after undo name:', await page.evaluate(() => __forge.getState().build.name))
+// lift task with the arm
+await page.evaluate(() => __forge.getState().setTask({ kind: 'lift', mass: 0.5, size: 0.08, pos: [0.45, 0, 0.04], height: 0.3 })); await sleep(700)
+console.log('payload present:', await page.evaluate(() => __forge.getState().geoms.n), 'geoms (was 6)')
+await page.keyboard.press(' '); await sleep(2500)
+console.log('arm lift flags:', await flags())
+await page.screenshot({ path: `${OUT}/forge_task.png` })
+// rover travel + follow camera
+await page.keyboard.press('r'); await sleep(300)
+await page.evaluate(() => __forge.getState().loadSample('rover')); await sleep(600)
+await page.evaluate(() => __forge.getState().setTask({ kind: 'travel', distance: 1 })); await sleep(400)
+await page.keyboard.press(' '); await sleep(5000)
+console.log('rover flags:', await flags())
+await page.screenshot({ path: `${OUT}/forge_rover.png` })
+// share link round trip
+await page.keyboard.press('r'); await sleep(300)
+await page.evaluate(() => [...document.querySelectorAll('.controls button')].find(b => b.textContent.includes('Share')).click()); await sleep(800)
+const url = page.url(); console.log('share url length:', url.length)
+await page.goto('about:blank'); await page.goto(url, { waitUntil: 'load' }); await ready(); await sleep(1500)
+console.log('reloaded from link:', await page.evaluate(() => __forge.getState().build.name), '| task:', await page.evaluate(() => JSON.stringify(__forge.getState().build.task)))
+// mirror copy a wheel via the tree button
+await page.evaluate(() => { const n = [...document.querySelectorAll('.tree .node')].find(n => n.textContent.includes('wheel_fl')); n.click(); n.querySelectorAll('.actions button')[1].click() }); await sleep(700)
+console.log('bodies after mirror:', await page.evaluate(() => Object.keys(__forge.getState().bodyIds).length), '(was 5) | load error:', await page.evaluate(() => __forge.getState().loadError))
+// drag gizmo: select shoulder on the arm sample and move the handle programmatically is not possible; instead verify the handle appears when a part is selected
+await page.evaluate(() => __forge.getState().loadSample('arm')); await sleep(600)
+await page.mouse.move(700, 470); await page.mouse.down(); await page.mouse.up(); await sleep(400)
+await page.screenshot({ path: `${OUT}/forge_gizmo.png` })
+console.log('selected for gizmo:', await page.evaluate(() => { const s = __forge.getState(); return s.selectedId && s.build.root.children[0]?.id === s.selectedId ? 'shoulder' : s.selectedId }))
+// walker: stand task should fail (it falls)
+await page.evaluate(() => __forge.getState().loadSample('walker')); await sleep(600)
+await page.evaluate(() => __forge.getState().setTask({ kind: 'stand', seconds: 3 })); await sleep(400)
+await page.keyboard.press(' '); await sleep(3500)
+console.log('walker flags:', await flags())
+console.log('page errors:', errs.length ? errs : 'none')
+await browser.close()

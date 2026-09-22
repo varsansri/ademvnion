@@ -1,14 +1,31 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Viewport from './view/Viewport'
 import Tree from './ui/Tree'
 import Inspector from './ui/Inspector'
 import Controls from './ui/Controls'
 import Verdict from './ui/Verdict'
-import { exportMjcf, useStore } from './store'
+import { exportMjcf, loadFromUrl, useStore } from './store'
 
 export default function App() {
   const [showXml, setShowXml] = useState(false)
   const build = useStore(s => s.build)
+  const toast = useStore(s => s.toast)
+  useEffect(() => {
+    void loadFromUrl()
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return
+      const st = useStore.getState()
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) st.redo(); else st.undo() }
+      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); st.redo() }
+      else if (e.key === ' ') { e.preventDefault(); if (st.frame?.running) st.pause(); else st.run() }
+      else if (e.key.toLowerCase() === 'r') st.reset()
+      else if (e.key === 'Delete' || e.key === 'Backspace') { if (st.selectedId && st.selectedId !== st.build.root.id) st.removeBody(st.selectedId) }
+      else if (e.key === 'Escape') st.select(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
   const download = () => {
     const blob = new Blob([exportMjcf()], { type: 'application/xml' })
     const a = document.createElement('a')
@@ -35,6 +52,7 @@ export default function App() {
         <Inspector />
         <Verdict />
       </aside>
+      {toast && <div className="toast">{toast}</div>}
       {showXml && (
         <div className="modal" onClick={() => setShowXml(false)}>
           <div className="sheet" onClick={e => e.stopPropagation()}>

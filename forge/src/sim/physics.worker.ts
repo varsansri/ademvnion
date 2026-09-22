@@ -17,6 +17,10 @@ let energy = 0
 let lastTick = 0
 let frameTimer: ReturnType<typeof setTimeout> | null = null
 let rootBodyId = 1
+let payloadBodyId = -1
+let bodyNames: string[] = []
+let startX = 0, startY = 0
+let maxPayloadZ = -1
 let modelCounter = 0
 
 const post = (m: FromWorker, transfer?: Transferable[]) => (self as unknown as Worker).postMessage(m, transfer ?? [])
@@ -27,7 +31,7 @@ function dispose() {
   model = null; data = null
 }
 
-function load(xml: string, acts: ActuatorMeta[]) {
+function load(xml: string, acts: ActuatorMeta[], names: string[]) {
   dispose()
   const path = `/w/model_${++modelCounter}.xml`
   try { mujoco.FS.mkdir('/w') } catch { /* exists */ }
@@ -42,10 +46,14 @@ function load(xml: string, acts: ActuatorMeta[]) {
   }
   data = new mujoco.MjData(model)
   actuators = acts
+  bodyNames = names
   energy = 0
   running = false
   const n: number = model.ngeom
   rootBodyId = n > 0 && model.nbody > 1 ? 1 : 0
+  const pi = names.indexOf('payload')
+  payloadBodyId = pi >= 0 ? pi + 1 : -1
+  maxPayloadZ = -1
   post({
     type: 'loaded',
     geoms: {
@@ -58,8 +66,11 @@ function load(xml: string, acts: ActuatorMeta[]) {
     nu: model.nu,
     timestep: model.opt.timestep,
     rootBodyId,
+    nbody: model.nbody,
+    bodyNames: names,
   })
   mujoco.mj_forward(model, data)
+  startX = data.xpos[rootBodyId * 3]; startY = data.xpos[rootBodyId * 3 + 1]
   sendFrame()
 }
 
@@ -99,6 +110,9 @@ function sendFrame() {
   const xm = data.xmat
   const rootUp = model.nbody > 1 ? xm[rootBodyId * 9 + 8] : 1
   const xp = data.xpos
+  const dx = xp[rootBodyId * 3] - startX, dy = xp[rootBodyId * 3 + 1] - startY
+  const payloadZ = payloadBodyId > 0 ? xp[payloadBodyId * 3 + 2] : -1
+  if (payloadZ > maxPayloadZ) maxPayloadZ = payloadZ
   const frame = {
     type: 'frame' as const,
     time: data.time as number,
@@ -108,12 +122,17 @@ function sendFrame() {
     force: Float32Array.from(f),
     rootPos: Float32Array.of(xp[rootBodyId * 3], xp[rootBodyId * 3 + 1], xp[rootBodyId * 3 + 2]),
     rootUp,
+    bodyPos: Float32Array.from(xp),
+    bodyMat: Float32Array.from(xm),
+    travel: Math.hypot(dx, dy),
+    payloadZ,
+    maxPayloadZ,
     power,
     energy,
     contacts: data.ncon as number,
     running,
   }
-  post(frame, [frame.xpos.buffer, frame.xmat.buffer, frame.ctrl.buffer, frame.force.buffer, frame.rootPos.buffer])
+  post(frame, [frame.xpos.buffer, frame.xmat.buffer, frame.ctrl.buffer, frame.force.buffer, frame.rootPos.buffer, frame.bodyPos.buffer, frame.bodyMat.buffer])
 }
 
 function loop() {
@@ -144,11 +163,11 @@ self.onmessage = (ev: MessageEvent<ToWorker>) => {
   const m = ev.data
   if (!mujoco) return
   switch (m.type) {
-    case 'load': load(m.xml, m.actuators); break
+    case 'load': load(m.xml, m.actuators, m.bodyNames); break
     case 'run': start(); break
     case 'pause': running = false; sendFrame(); break
     case 'step': if (model) { running = false; stepN(Math.round(1 / 60 / model.opt.timestep)); sendFrame() } break
-    case 'reset': if (model) { running = false; mujoco.mj_resetData(model, data); energy = 0; mujoco.mj_forward(model, data); sendFrame() } break
+    case 'reset': if (model) { running = false; mujoco.mj_resetData(model, data); energy = 0; maxPayloadZ = -1; mujoco.mj_forward(model, data); sendFrame() } break
     case 'ctrl': if (data && m.index < model.nu) { data.ctrl[m.index] = m.value; if (!running) sendFrame() } break
     case 'drive': driveOn = m.on; break
     case 'speed': speed = Math.max(0.05, Math.min(4, m.value)); break
