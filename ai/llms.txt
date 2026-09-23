@@ -8,7 +8,7 @@ Updated 2026-09-24. Each reference below is a plain-text twin of a canonical HTM
 
 - [Adem Forge — robot design software in the browser](https://ademvnion.com/app/) — reference: https://ademvnion.com/ai/forge.md
 - [Inside the SO-ARM101 — every part of an open-source robot arm](https://ademvnion.com/inside/so-arm101/) — reference: https://ademvnion.com/ai/so-arm101.md
-- [What's inside the Unitree Go2 — every chip, from its FCC filing](https://ademvnion.com/inside/unitree-go2/) — reference: https://ademvnion.com/ai/unitree-go2.md
+- [What's inside the Unitree Go2 — every chip, rebuilt in 3D](https://ademvnion.com/inside/unitree-go2/) — reference: https://ademvnion.com/ai/unitree-go2.md
 - [Inside real robots — interactive teardowns](https://ademvnion.com/inside/) — reference: https://ademvnion.com/ai/inside.md
 - [Ademvnion — wearable human enhancement](https://ademvnion.com/) — reference: https://ademvnion.com/ai/home.md
 

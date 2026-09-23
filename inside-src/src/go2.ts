@@ -2,10 +2,12 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
+import { startBench } from './bench'
+import { coreBoard, lteCard, wifiModule, radioBoard, uwbBoard, blowerFan, type Built } from './parts'
 
 // The Unitree Go2 on /inside/unitree-go2/: Unitree's own published model
-// (via MuJoCo Menagerie), with numbered pins for the parts read from the FCC
-// filing, an X-ray mode that fades the shell and shows where they sit, and a
+// (via MuJoCo Menagerie), with numbered pins for the parts found in the
+// teardown, an X-ray mode that fades the shell and shows where they sit, and a
 // walk cycle. Loaded by the static page with a fixed filename, like hero.js.
 
 const DIR = '/inside/unitree-go2/'
@@ -25,7 +27,7 @@ const PARTS: Part[] = [
     text: 'The computer: 8-core Arm with an AI accelerator, 8 GB memory, 64 GB storage, on a plug-in board under a heatsink. Chip markings ground off; identified from the identical board in Unitree’s humanoid.',
     at: [0.0, 0, 0.03], box: [0.075, 0.06, 0.012] },
   { n: 2, id: '4g', name: '4G: Quectel EG25-G', status: 'Read', card: 'p-4g',
-    text: 'An M.2 cellular card with a Qualcomm MDM9207 modem, so the app can reach the dog away from home Wi-Fi.',
+    text: 'A plug-in mini PCIe 4G card with a Qualcomm MDM9207 modem, so the app can reach the dog away from home Wi-Fi.',
     at: [-0.075, 0.02, 0.034], box: [0.052, 0.03, 0.004] },
   { n: 3, id: 'wifi', name: 'Wi-Fi 6 + Bluetooth: Realtek RTL8852BU', status: 'Read', card: 'p-wifi',
     text: 'A soldered module (LB-Link BL-M8852BU1) with two antennas. The phone app and controller connect here.',
@@ -51,6 +53,7 @@ const STATUS_COLOR: Record<Status, string> = { Read: '#4ade80', Matched: '#fbbf2
 const root = document.getElementById('go2-3d')
 const stage = document.getElementById('go2stage')
 if (root && stage) main(root, stage).catch(err => { console.error(err); root.classList.add('failed') })
+try { startBench() } catch (err) { console.error(err); document.getElementById('parts-3d')?.classList.add('failed') }
 
 async function main(root: HTMLElement, stage: HTMLElement) {
   const [data, pack] = await Promise.all([
@@ -160,13 +163,29 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   const mainBoard = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.075, 0.003), glow('#2dd4bf', 0.35))
   mainBoard.position.set(0, 0, 0.022)
   inner.add(mainBoard)
+  // The rebuilt parts themselves (millimetre models from parts.ts), each in a
+  // thin status-coloured outline that stays visible through the shell.
+  const MODELS: Record<string, [() => Built, number, number[]]> = {
+    brain: [coreBoard, 0.9, [0, 0, 0]], '4g': [lteCard, 0.9, [0, 0, 0]], wifi: [wifiModule, 1, [0, 0, 0]],
+    radio: [radioBoard, 1, [0, 0, 0]], uwb: [uwbBoard, 0.7, [0, 0, 0]], fans: [blowerFan, 0.8, [Math.PI / 2, 0, 0]],
+  }
+  const outlines = new Map<string, THREE.LineBasicMaterial>()
   for (const p of PARTS) {
-    if (!p.box) continue
-    const b = new THREE.Mesh(new THREE.BoxGeometry(p.box[0], p.box[1], p.box[2]), glow(STATUS_COLOR[p.status]))
-    b.position.fromArray(p.at)
-    b.renderOrder = 10
-    inner.add(b)
-    blocks.set(p.id, b)
+    const def = MODELS[p.id]
+    if (!def) continue
+    const built = def[0]()
+    const g = built.group
+    g.scale.setScalar(0.001 * def[1])
+    g.rotation.set(def[2][0], def[2][1], def[2][2])
+    const bb = new THREE.Box3().setFromObject(g)
+    g.position.fromArray(p.at).sub(bb.getCenter(new THREE.Vector3()))
+    inner.add(g)
+    const size = bb.getSize(new THREE.Vector3()).addScalar(0.004)
+    const lm = new THREE.LineBasicMaterial({ color: STATUS_COLOR[p.status], transparent: true, opacity: 0.45, depthTest: false })
+    const line = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(size.x, size.y, size.z)), lm)
+    line.position.fromArray(p.at); line.renderOrder = 11
+    inner.add(line)
+    outlines.set(p.id, lm)
   }
   const lidar = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.03, 24), glow(STATUS_COLOR.Inferred))
   lidar.position.fromArray(PARTS.find(p => p.id === 'lidar')!.at)
@@ -251,12 +270,24 @@ async function main(root: HTMLElement, stage: HTMLElement) {
     pinFor.forEach((b, k) => b.classList.toggle('on', k === selected))
     list.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.id === selected))
     blocks.forEach((m, k) => ((m.material as THREE.MeshStandardMaterial).emissiveIntensity = k === selected ? 2.2 : 0.9))
+    outlines.forEach((m, k) => (m.opacity = k === selected ? 1 : 0.45))
     ringMat.emissiveIntensity = selected === 'motors' ? 2.2 : 0.9
     if (p && !xray) setXray(true)
+    focus(p ?? null)
     info.innerHTML = p
-      ? `<p class="k"><span class="chip" style="--c:${STATUS_COLOR[p.status]}">${p.status}</span> Part ${p.n}</p><h3>${p.name}</h3><p>${p.text}</p><p><a href="#${p.card}">Full details and FCC page ↓</a></p>`
-      : `<p class="k">Tap a number</p><p>Each number is a part read from the FCC filing. X-ray fades the shell to show where it sits.</p>`
+      ? `<p class="k"><span class="chip" style="--c:${STATUS_COLOR[p.status]}">${p.status === 'Hidden' ? 'Ground blank' : p.status}</span> Part ${p.n}</p><h3>${p.name}</h3><p>${p.text}</p><p><a href="#${p.card}">Full details ↓</a></p>`
+      : `<p class="k">Tap a number</p><p>Each number is a part found in the teardown. X-ray fades the shell to show the rebuilt parts inside.</p>`
     invalidate()
+  }
+
+  // --- camera glide: fly in close to a picked part, back out when cleared ---
+  let goal: { pos: THREE.Vector3; tgt: THREE.Vector3 } | null = null
+  function focus(p: Part | null) {
+    if (!p) { goal = { pos: HOME_CAM.clone(), tgt: HOME_TGT.clone() }; return }
+    const at = worldOf(p, new THREE.Vector3())
+    const dir = camera.position.clone().sub(controls.target).normalize()
+    const dist = p.id === 'motors' ? 0.55 : 0.34
+    goal = { pos: at.clone().addScaledVector(dir, dist), tgt: at }
   }
 
   // --- X-ray ---
@@ -289,7 +320,7 @@ async function main(root: HTMLElement, stage: HTMLElement) {
     invalidate()
   })
   ;(root.querySelector('[data-act="reset"]') as HTMLButtonElement).addEventListener('click', () => {
-    camera.position.copy(HOME_CAM); controls.target.copy(HOME_TGT); controls.update()
+    goal = null; camera.position.copy(HOME_CAM); controls.target.copy(HOME_TGT); controls.update()
     if (selected) select(selected)
     setXray(false)
   })
@@ -310,6 +341,7 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   let dirty = true
   const invalidate = () => { dirty = true }
   controls.addEventListener('change', invalidate)
+  controls.addEventListener('start', () => { goal = null })
   new ResizeObserver(() => { resize(); invalidate() }).observe(stage)
   let visible = true
   new IntersectionObserver(es => { visible = es[0].isIntersecting; invalidate() }, { rootMargin: '100px' }).observe(stage)
@@ -330,6 +362,11 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   renderer.setAnimationLoop(() => {
     if (!visible) return
     const moving = walking || !calm
+    if (goal) {
+      camera.position.lerp(goal.pos, 0.12); controls.target.lerp(goal.tgt, 0.12)
+      if (camera.position.distanceTo(goal.pos) < 0.002) goal = null
+      dirty = true
+    }
     if (moving) {
       poseAt((performance.now() - t0) / 1000, walking)
       apply()

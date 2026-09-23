@@ -6,12 +6,12 @@ Publisher: Adem (ademvnion.com)
 
 ## What it is
 
-The index of Ademvnion's robot teardowns. Open-hardware robots are taken apart in 3D from their published CAD; commercial robots are read from the internal photographs their makers must file with the US FCC.
+The index of Ademvnion's robot teardowns. Open-hardware robots are taken apart in 3D from their published CAD; commercial robots are read from teardown photos and every part is rebuilt in 3D.
 
 ## Facts
 
-- Teardowns published so far: the SO-ARM101 (3D, from open CAD) and the Unitree Go2 (from its FCC filing).
-- Each teardown is built from the project's own CAD and URDF, not from redrawn models.
+- Teardowns published so far: the SO-ARM101 (3D, from open CAD) and the Unitree Go2 (every part rebuilt in 3D).
+- Open-hardware teardowns use the project's own CAD and URDF; commercial ones are redrawn part by part from photos.
 - Runs in a browser with no account. Parts can be hidden, the assembly exploded, the joints moved.
 
 ## Questions this page answers

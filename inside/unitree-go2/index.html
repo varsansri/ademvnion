@@ -3,25 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What's Inside the Unitree Go2 — Every Chip, From Its FCC Filing</title>
-<meta name="description" content="The Unitree Go2 robot dog opened up, read from its 68-page public FCC filing: a Rockchip RK3588S brain, Quectel 4G, Realtek Wi-Fi 6, UWB, 12 leg motors with their own driver boards — and the chips Unitree sanded blank.">
+<title>What's Inside the Unitree Go2 — Every Chip, Rebuilt in 3D</title>
+<meta name="description" content="The Unitree Go2 robot dog taken apart and rebuilt in 3D: the Rockchip RK3588S computer, Quectel 4G, Realtek Wi-Fi 6, UWB, twelve leg motors, and the chips Unitree ground blank. Turn every part and read every marking.">
 <link rel="canonical" href="https://ademvnion.com/inside/unitree-go2/">
 <meta name="theme-color" content="#07080b">
 <meta property="og:site_name" content="Ademvnion">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://ademvnion.com/inside/unitree-go2/">
-<meta property="og:title" content="What's inside the Unitree Go2 — every chip we could read">
-<meta property="og:description" content="Read from the robot dog's own FCC filing: the processor, the 4G and Wi-Fi chips, the 12 motor boards, and the chips Unitree sanded blank.">
+<meta property="og:title" content="What's inside the Unitree Go2 — every chip, rebuilt in 3D">
+<meta property="og:description" content="The robot dog taken apart: the computer, the 4G and Wi-Fi chips, the twelve leg motors, and the chips Unitree ground blank. Turn every part in 3D.">
 <meta property="og:image" content="https://ademvnion.com/img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Ademvnion — Human, enhanced">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="What's inside the Unitree Go2 — every chip we could read">
-<meta name="twitter:description" content="Read from the robot dog's own FCC filing: processor, 4G, Wi-Fi 6, UWB, 12 motor boards — and the chips Unitree sanded blank.">
+<meta name="twitter:title" content="What's inside the Unitree Go2 — every chip, rebuilt in 3D">
+<meta name="twitter:description" content="The robot dog taken apart: computer, 4G, Wi-Fi 6, UWB, twelve leg motors — and the chips Unitree ground blank.">
 <meta name="twitter:image" content="https://ademvnion.com/img/og.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://ademvnion.com/"},{"@type":"ListItem","position":2,"name":"Inside real robots","item":"https://ademvnion.com/inside/"},{"@type":"ListItem","position":3,"name":"Unitree Go2","item":"https://ademvnion.com/inside/unitree-go2/"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What processor does the Unitree Go2 use?","acceptedAnswer":{"@type":"Answer","text":"A Rockchip RK3588S, an 8-core Arm chip with a built-in AI accelerator, on a plug-in core board marked XF_RK_Core_Board_V10 with 8 GB of memory and 64 GB of storage. The chip tops on the Go2 are ground blank, but the same core board appears in Unitree's 2025 humanoid filing with its markings intact."}},{"@type":"Question","name":"Does the Unitree Go2 have 4G?","acceptedAnswer":{"@type":"Answer","text":"The unit Unitree sent for FCC testing has a Quectel EG25-G 4G LTE module (FCC ID XMR201903EG25G) built on a Qualcomm MDM9207 modem, plugged into an M.2 slot on the main board. It also carries Wi-Fi 6 and Bluetooth (Realtek RTL8852BU), UWB and a separate long-range radio for the remote."}},{"@type":"Question","name":"How many motors does the Go2 have?","acceptedAnswer":{"@type":"Answer","text":"Twelve leg motors, three per leg. Each is an outrunner brushless motor with its own round driver board (marked M12_MDRV_V1.9.1, dated 2023/5/10) mounted inside the joint, so the main computer sends commands over a bus instead of driving motor current itself."}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What processor does the Unitree Go2 use?","acceptedAnswer":{"@type":"Answer","text":"A Rockchip RK3588S, an 8-core Arm chip with a built-in AI accelerator, on a plug-in core board marked XF_RK_Core_Board_V10 with 8 GB of memory and 64 GB of storage. The chip tops on the Go2 are ground blank, but the same core board appears in Unitree's 2025 humanoid with its markings intact."}},{"@type":"Question","name":"Does the Unitree Go2 have 4G?","acceptedAnswer":{"@type":"Answer","text":"The unit that was taken apart has a Quectel EG25-G 4G LTE card built on a Qualcomm MDM9207 modem, pushed into a mini PCIe socket on the main board. It also carries Wi-Fi 6 and Bluetooth (Realtek RTL8852BU), UWB and a separate long-range radio for the remote."}},{"@type":"Question","name":"How many motors does the Go2 have?","acceptedAnswer":{"@type":"Answer","text":"Twelve leg motors, three per leg. Each is an outrunner brushless motor with its own round driver board (marked M12_MDRV_V1.9.1, dated 2023/5/10) mounted inside the joint, so the main computer sends commands over a bus instead of driving motor current itself."}}]}</script>
 <!-- Umami. Every page needs its own copy: static builds, no shared include. -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="473ac96b-268f-4710-9840-e8f27f67fac9"></script>
 <link rel="icon" href="/img/favicon.ico" sizes="32x32">
@@ -30,90 +30,128 @@
 <link rel="icon" type="image/png" href="/img/icon-192.png" sizes="192x192">
 <link rel="icon" type="image/png" href="/img/icon-512.png" sizes="512x512">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="modulepreload" href="/inside/unitree-go2/js/go2.js">
 <style>
-:root{--bg:#07080b;--bg2:#0d0f14;--bg3:#12151c;--fg:#f4f5f7;--muted:#9aa3b2;--dim:#5b6373;--line:#1b1f28;--line2:#262c38;--accent:#7dd3fc;--accent2:#c084fc;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--gutter:clamp(16px,4vw,40px)}
+:root{--bg:#07080b;--bg2:#0d0f14;--bg3:#12151c;--fg:#f4f5f7;--muted:#9aa3b2;--dim:#5b6373;--line:#1b1f28;--line2:#262c38;--accent:#7dd3fc;--accent2:#c084fc;--read:#4ade80;--matched:#fbbf24;--hidden:#f87171;--inferred:#c084fc;--gutter:clamp(16px,4vw,40px)}
 *{box-sizing:border-box;margin:0;padding:0}
-html{color-scheme:dark}
+html{color-scheme:dark;scroll-behavior:smooth}
 body{background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;-webkit-font-smoothing:antialiased}
 a{color:var(--accent)}
-.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 var(--gutter);height:56px;border-bottom:1px solid var(--line);background:#07080bcc;backdrop-filter:blur(12px)}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 var(--gutter);height:56px;border-bottom:1px solid var(--line);background:#07080bcc;backdrop-filter:blur(12px)}
 .brand{display:flex;align-items:center;gap:8px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:12px;text-decoration:none;color:var(--fg)}
 .brand em{font-style:normal;color:var(--muted)}
 .mark{width:26px;height:26px;object-fit:contain;display:block}
 .top nav{display:flex;gap:18px;font-size:13px}
 .top nav a{text-decoration:none;color:var(--muted)}
 .top nav a:hover{color:var(--fg)}
-main{max-width:980px;margin:0 auto;padding:0 var(--gutter) 60px}
+main{max-width:1180px;margin:0 auto;padding:0 var(--gutter) 70px}
 .crumbs{font-size:12px;color:var(--dim);padding-top:26px}
 .crumbs a{color:var(--muted);text-decoration:none}
-.hero{padding:12px 0 8px}
-h1{font-size:clamp(30px,5vw,50px);letter-spacing:-.03em;line-height:1.05;font-weight:600}
-.lede{color:var(--muted);max-width:68ch;margin-top:14px;font-size:16px}
-.totals{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:16px;color:var(--muted);font-size:13px}
-.totals b{color:var(--fg);font-weight:600}
-h2{font-size:24px;letter-spacing:-.02em;margin:44px 0 10px;font-weight:600}
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px 44px;align-items:end;padding:14px 0 6px}
+.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(34px,5.4vw,60px);letter-spacing:-.035em;line-height:1.02;font-weight:650;margin-top:10px}
+h1 span{background:linear-gradient(90deg,#f4f5f7,#9fdcfb 60%,#c9a7fb);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{color:var(--muted);max-width:60ch;margin-top:16px;font-size:16.5px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,#0f1218,#0b0d12);padding:12px 14px}
+.stat b{display:block;font-size:24px;letter-spacing:-.02em;font-weight:650}
+.stat span{display:block;color:var(--muted);font-size:12.5px;line-height:1.35;margin-top:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);margin-top:14px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:6px;box-shadow:0 0 10px var(--c)}
+h2{font-size:clamp(22px,2.6vw,30px);letter-spacing:-.025em;margin:64px 0 6px;font-weight:650}
+.sub{color:var(--muted);max-width:70ch}
 h3{font-size:17px;margin:0 0 6px;font-weight:600}
-p{color:var(--muted);max-width:70ch}
+p{color:var(--muted);max-width:72ch}
 p b,li b{color:var(--fg);font-weight:500}
-.short{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px}
-.short div{border:1px solid var(--line);border-radius:12px;background:var(--bg2);padding:12px 14px}
+
+/* 3D stages */
+.viewer,.bench{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:12px;margin-top:18px}
+.stage3d{position:relative;border:1px solid var(--line2);border-radius:16px;overflow:hidden;background:radial-gradient(110% 85% at 50% 15%,#161b27,#090b10 72%);min-height:340px;touch-action:pan-y}
+.stage3d::before{content:"";position:absolute;inset:0;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:36px 36px;mask-image:radial-gradient(80% 70% at 50% 60%,#000,transparent);pointer-events:none}
+.viewer .stage3d{aspect-ratio:16/10}
+.bench .stage3d{aspect-ratio:16/11}
+.stage3d canvas{position:relative;display:block;width:100%!important;height:100%!important;cursor:grab}
+.stage3d canvas:active{cursor:grabbing}
+.stage3d .load{position:absolute;inset:0;display:grid;place-items:center;color:var(--dim);font-size:13px}
+.ready .load{display:none}
+.failed .load::after{content:" — could not load the 3D view."}
+.pins{position:absolute;inset:0;pointer-events:none}
+.pin{position:absolute;left:0;top:0;pointer-events:auto;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--c);background:#07080bd9;color:var(--fg);font:600 11px/1 system-ui,sans-serif;cursor:pointer;display:grid;place-items:center;box-shadow:0 0 0 3px #07080b55,0 0 14px -2px var(--c);transition:width .15s,height .15s,background .15s}
+.pin:hover,.pin.on{background:var(--c);color:#07080b}
+.pin.stem::after{content:"";position:absolute;left:50%;top:100%;width:1.5px;height:14px;background:linear-gradient(var(--c),transparent);transform:translateX(-50%)}
+.pin.stem::before{content:"";position:absolute;left:50%;top:calc(100% + 12px);width:5px;height:5px;border-radius:50%;background:var(--c);transform:translateX(-50%)}
+#go2-3d.xr .pin:not(.on){width:12px;height:12px;font-size:0;background:var(--c);border-color:#07080b}
+.bar{position:absolute;left:10px;bottom:10px;display:flex;gap:6px;flex-wrap:wrap}
+.bar button{font:inherit;cursor:pointer;background:#12151ce6;border:1px solid var(--line2);color:var(--muted);border-radius:9px;padding:7px 13px;font-size:13px;backdrop-filter:blur(6px)}
+.bar button:hover,.bar button.on{color:var(--fg);border-color:var(--accent)}
+.bar button.on{background:#0f1a24;box-shadow:0 0 16px -4px var(--accent)}
+.hint{position:absolute;right:12px;top:10px;font-size:11.5px;color:var(--dim);pointer-events:none}
+.side3d{border:1px solid var(--line);border-radius:16px;background:var(--bg2);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0;overflow:auto}
+.info h3{font-size:16px;margin:4px 0}
+.info p{font-size:13.5px;margin-top:4px}
+.k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{color:var(--c);border:1px solid var(--c);border-radius:99px;padding:1px 8px;letter-spacing:.06em}
+.plist{list-style:none;border-top:1px solid var(--line);padding-top:8px;display:grid;gap:2px}
+.plist button,.clist button{font:inherit;cursor:pointer;width:100%;text-align:left;background:none;border:0;color:var(--muted);border-radius:8px}
+.plist button{font-size:13px;padding:5px 6px;display:flex;gap:8px;align-items:center}
+.plist button:hover,.plist button.on,.clist button:hover,.clist button.on{background:var(--bg3);color:var(--fg)}
+.plist i,.clist i{font-style:normal;flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--c,var(--accent));display:grid;place-items:center;font-size:10.5px;font-weight:600;color:var(--fg)}
+
+.btabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-top:18px;scrollbar-width:thin}
+.btabs button{flex:none;font:inherit;cursor:pointer;display:flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:7px 14px;font-size:13px}
+.btabs button i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.btabs button:hover{color:var(--fg)}
+.btabs button.on{color:var(--fg);border-color:var(--accent);background:#0f1a24}
+.bench .bside{max-height:100%}
+.bside .blurb{font-size:14px;color:var(--fg)}
+.tg,.ex{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg);background:var(--bg3);border:1px solid var(--line2);border-radius:9px;padding:8px 10px;cursor:pointer}
+.tg input{accent-color:var(--accent)}
+.ex input{flex:1;accent-color:var(--accent2)}
+.clist{list-style:none;display:grid;gap:2px;border-top:1px solid var(--line);padding-top:8px}
+.clist button{display:flex;gap:10px;align-items:flex-start;padding:7px 6px}
+.clist b{display:block;color:var(--fg);font-weight:550;font-size:13.5px}
+.clist small{display:block;font-size:12.5px;line-height:1.45;color:var(--muted);margin-top:2px}
+.clist button:not(.on) small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* content */
+.short{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:16px}
+.short div{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#0f1218,#0b0d12);padding:14px 16px}
 .short span{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-.short b{display:block;font-size:15px;margin-top:4px;font-weight:600}
+.short b{display:block;font-size:16px;margin-top:5px;font-weight:600}
 .short small{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}
-figure.map{border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:14px;margin-top:12px}
+figure.map{border:1px solid var(--line);border-radius:16px;background:var(--bg2);padding:14px;margin-top:14px}
 figure.map .scroll{overflow-x:auto}
 figure.map svg{width:100%;min-width:640px;height:auto;display:block}
 figure.map figcaption{font-size:12.5px;color:var(--dim);margin-top:8px}
-.part{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:10px 0;background:var(--bg2)}
+.parts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.part{border:1px solid var(--line);border-radius:16px;padding:16px 18px;background:var(--bg2);scroll-margin-top:80px}
+.part:target{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
 .part h3{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
-.conf{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;padding:2px 8px;border-radius:99px;border:1px solid var(--line2)}
-.conf.h{color:var(--ok);border-color:#1f4d33}
-.conf.m{color:var(--warn);border-color:#5a4513}
+.conf{font-size:10.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;padding:2px 8px;border-radius:99px;border:1px solid currentColor}
+.conf.h{color:var(--read)}.conf.m{color:var(--matched)}.conf.x{color:var(--hidden)}.conf.i{color:var(--inferred)}
 .part p{margin-top:6px;font-size:14px}
 .part ul{margin:8px 0 0 18px;color:var(--muted);font-size:13.5px}
-.part .src{font-size:12.5px;color:var(--dim);margin-top:8px}
-.part .src a{color:var(--muted)}
-.callout{border-left:3px solid var(--warn);background:#16130a;padding:14px 16px;border-radius:0 12px 12px 0;margin-top:12px}
-.callout p{color:#d6c9a6}
-.tablewrap{overflow-x:auto;margin-top:12px;border:1px solid var(--line);border-radius:12px}
-table{border-collapse:collapse;width:100%;font-size:13px;min-width:640px}
-th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.part .see{display:inline-block;margin-top:10px;font-size:12.5px;background:none;border:1px solid var(--line2);color:var(--muted);border-radius:8px;padding:4px 10px;cursor:pointer;font-family:inherit}
+.part .see:hover{color:var(--fg);border-color:var(--accent)}
+.callout{border:1px solid #4a2a2a;background:linear-gradient(180deg,#1a0f10,#120b0c);padding:18px 20px;border-radius:16px;margin-top:14px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.callout .ico{width:42px;height:42px;border-radius:10px;background:repeating-linear-gradient(135deg,#3a3c42 0 3px,#2c2e33 3px 6px);border:1px solid #55585f}
+.callout p{color:#e2c9c9}
+.tablewrap{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:620px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 th{color:var(--dim);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--bg2)}
 td{color:var(--muted)}
 td:first-child{color:var(--fg)}
 tr:last-child td{border-bottom:0}
-.qa details{border:1px solid var(--line);border-radius:12px;background:var(--bg2);padding:12px 16px;margin-top:8px}
+td .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:6px}
+.qa details{border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:13px 16px;margin-top:8px}
 .qa summary{cursor:pointer;font-weight:500}
 .qa details p{margin-top:8px;font-size:14px}
-.viewer{display:grid;grid-template-columns:1fr 300px;gap:12px;margin-top:22px}
-.stage3d{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#141824,#0a0c11 70%);aspect-ratio:16/11;min-height:320px;touch-action:pan-y}
-.stage3d canvas{display:block;width:100%!important;height:100%!important;cursor:grab}
-.stage3d .load{position:absolute;inset:0;display:grid;place-items:center;color:var(--dim);font-size:13px}
-#go2-3d.ready .load{display:none}
-#go2-3d.failed .load::after{content:" — could not load the 3D model."}
-.pins{position:absolute;inset:0;pointer-events:none}
-.pin{position:absolute;left:0;top:0;pointer-events:auto;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--c);background:#07080bd9;color:var(--fg);font:600 11px/1 system-ui,sans-serif;cursor:pointer;display:grid;place-items:center;box-shadow:0 0 0 3px #07080b66}
-.pin:hover,.pin.on{background:var(--c);color:#07080b}
-#go2-3d.xr .pin:not(.on){width:12px;height:12px;font-size:0;background:var(--c);border-color:#07080b}
-.pin{transition:width .15s,height .15s}
-.bar{position:absolute;left:10px;bottom:10px;display:flex;gap:6px;flex-wrap:wrap}
-.bar button,.plist button{font:inherit;cursor:pointer}
-.bar button{background:#12151ce6;border:1px solid var(--line2);color:var(--muted);border-radius:8px;padding:6px 12px;font-size:13px}
-.bar button:hover,.bar button.on{color:var(--fg);border-color:var(--accent)}
-.bar button.on{background:#0f1a24}
-.side3d{border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.info h3{font-size:16px;margin:4px 0}
-.info p{font-size:13.5px;margin-top:4px}
-.info .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);display:flex;gap:8px;align-items:center}
-.chip{color:var(--c);border:1px solid var(--c);border-radius:99px;padding:1px 7px;letter-spacing:.06em}
-.plist{list-style:none;border-top:1px solid var(--line);padding-top:8px;display:grid;gap:2px}
-.plist button{width:100%;text-align:left;background:none;border:0;color:var(--muted);font-size:13px;padding:5px 6px;border-radius:6px;display:flex;gap:8px;align-items:center}
-.plist button:hover,.plist button.on{background:var(--bg3);color:var(--fg)}
-.plist i{font-style:normal;flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--c);display:grid;place-items:center;font-size:10.5px;font-weight:600}
-@media (max-width:820px){.viewer{grid-template-columns:1fr}.stage3d{aspect-ratio:4/3.4}}
-.fine{font-size:12.5px;color:var(--dim);margin-top:10px}
+.fine{font-size:12.5px;color:var(--dim);margin-top:10px;max-width:none}
 .fine a{color:var(--muted)}
-@media (max-width:560px){.top nav a:first-child{display:none}.part h3{flex-direction:column;gap:4px}}
+@media (max-width:980px){.hero{grid-template-columns:1fr}.parts{grid-template-columns:1fr}}
+@media (max-width:820px){.viewer,.bench{grid-template-columns:1fr}.viewer .stage3d,.bench .stage3d{aspect-ratio:4/3.3}.side3d{max-height:none}.hint{display:none}}
+@media (max-width:560px){.top nav a:first-child{display:none}.part h3{flex-direction:column;gap:4px}.stats{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -124,32 +162,49 @@ tr:last-child td{border-bottom:0}
 <main>
   <p class="crumbs"><a href="/">Home</a> / <a href="/inside/">Inside real robots</a> / Unitree Go2</p>
   <section class="hero">
-    <h1>What's inside the Unitree Go2</h1>
-    <p class="lede">Every wireless product sold in the US has to be tested by the FCC, and after launch the test lab's photos of the opened product become public. Unitree's Go2 robot dog was taken apart for 68 pages. We read every page and named what could be named — and marked what Unitree deliberately made unreadable.</p>
-    <p class="totals"><span><b>68</b> pages of internal photos</span><span><b>12</b> leg motors, each with its own driver</span><span><b>4G · Wi-Fi 6 · UWB · LoRa</b></span><span>FCC ID <b>2A5PE-YUSHU004</b></span><span>Granted <b>May 2024</b></span></p>
+    <div>
+      <p class="eyebrow">Teardown · Robot dog</p>
+      <h1>What's inside the <span>Unitree Go2</span></h1>
+      <p class="lede">A Go2 was taken apart down to every board and motor, over 68 pages of lab photos. We read every chip we could, rebuilt each part in 3D below, and marked the chips Unitree ground blank so nobody could read them.</p>
+    </div>
+    <div>
+      <div class="stats">
+        <div class="stat"><b>RK3588S</b><span>8-core Arm brain with an AI accelerator</span></div>
+        <div class="stat"><b>12</b><span>leg motors, each with its own driver</span></div>
+        <div class="stat"><b>4G · Wi-Fi 6</b><span>plus UWB and a long-range remote link</span></div>
+        <div class="stat"><b>4</b><span>boards with their chip markings ground off</span></div>
+      </div>
+      <div class="legend"><span><i style="--c:var(--read)"></i>Read</span><span><i style="--c:var(--matched)"></i>Matched</span><span><i style="--c:var(--hidden)"></i>Ground blank</span><span><i style="--c:var(--inferred)"></i>Inferred</span></div>
+    </div>
   </section>
 
-  <section class="viewer" id="go2-3d" aria-label="3D model of the Unitree Go2 with the parts found in its FCC filing">
+  <section class="viewer" id="go2-3d" aria-label="3D model of the Unitree Go2 with its parts marked">
     <div class="stage3d" id="go2stage">
       <div class="load">Loading the 3D model…</div>
       <div class="pins"></div>
+      <span class="hint">Drag to turn</span>
       <div class="bar"><button type="button" data-act="xray" aria-pressed="false">X-ray</button><button type="button" data-act="walk" aria-pressed="false">Walk</button><button type="button" data-act="reset">Reset</button></div>
     </div>
     <div class="side3d">
-      <div class="info" aria-live="polite"><p class="k">Tap a number</p><p>Each number is a part read from the FCC filing. X-ray fades the shell to show where it sits.</p></div>
+      <div class="info" aria-live="polite"><p class="k">Tap a number</p><p>Each number is a part found in the teardown. X-ray fades the shell to show the rebuilt parts inside.</p></div>
       <ol class="plist"></ol>
     </div>
   </section>
-  <p class="fine">Drag to turn it. 3D model: Unitree's own <a href="https://github.com/unitreerobotics/unitree_ros/tree/master/robots/go2_description" rel="noopener" target="_blank">go2_description</a> via <a href="https://github.com/google-deepmind/mujoco_menagerie/tree/main/unitree_go2" rel="noopener" target="_blank">MuJoCo Menagerie</a>, © Unitree Robotics, <a href="/inside/unitree-go2/model-license.txt">BSD-3-Clause</a>. The leg motors sit where the model's joints are; where each board sits inside the body is approximate — the filing photographs the parts, not their positions.</p>
-  <script>
-  // Load the 3D view only when it is about to be seen; the text above never waits on it.
-  (function () {
-    var el = document.getElementById('go2-3d'), go = function () { import('/inside/unitree-go2/js/go2.js') }
-    if (!('IntersectionObserver' in window)) return go()
-    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); go() } }, { rootMargin: '400px' })
-    io.observe(el)
-  })()
-  </script>
+  <p class="fine">Robot model: Unitree's own <a href="https://github.com/unitreerobotics/unitree_ros/tree/master/robots/go2_description" rel="noopener" target="_blank">go2_description</a> via <a href="https://github.com/google-deepmind/mujoco_menagerie/tree/main/unitree_go2" rel="noopener" target="_blank">MuJoCo Menagerie</a>, © Unitree Robotics, <a href="/inside/unitree-go2/model-license.txt">BSD-3-Clause</a>. Leg motors sit at the model's real joints; where each board sits inside the body is approximate.</p>
+
+  <h2 id="parts">Every part, rebuilt in 3D</h2>
+  <p class="sub">Each board and motor redrawn from the teardown: outline, chip sizes and every marking we could read, printed on the chip exactly as it appears. Pick a part, turn it, tap a number.</p>
+  <section id="parts-3d" aria-label="Each part of the Go2 rebuilt in 3D">
+    <div class="btabs" role="tablist"></div>
+    <div class="bench">
+      <div class="stage3d" id="benchstage">
+        <div class="load">Loading the parts…</div>
+        <div class="pins"></div>
+        <span class="hint">Drag to turn · click, then scroll to zoom</span>
+      </div>
+      <aside class="side3d bside" aria-live="polite"></aside>
+    </div>
+  </section>
 
   <h2>The short answer</h2>
   <div class="short">
@@ -157,12 +212,12 @@ tr:last-child td{border-bottom:0}
     <div><span>Mobile data</span><b>Quectel EG25-G 4G</b><small>Qualcomm MDM9207 inside</small></div>
     <div><span>Wi-Fi + Bluetooth</span><b>Realtek RTL8852BU</b><small>Wi-Fi 6, on an LB-Link module</small></div>
     <div><span>Legs</span><b>12 brushless motors</b><small>a driver board inside every joint</small></div>
-    <div><span>Positioning</span><b>UWB board, 4 antennas</b><small>chips sanded blank</small></div>
-    <div><span>Remote link</span><b>Own long-range radio</b><small>plus a LoRa antenna; chips sanded blank</small></div>
+    <div><span>Positioning</span><b>UWB board, 4 antennas</b><small>chips ground blank</small></div>
+    <div><span>Remote link</span><b>Own long-range radio</b><small>plus a LoRa antenna; chips ground blank</small></div>
   </div>
 
   <h2>How it is wired</h2>
-  <p>Read straight off the silkscreen of the main board, <b>“712 MAIN BOARD-RK V0.21, 2023/6/17”</b>. Every label below is printed on the board itself.</p>
+  <p class="sub">Read straight off the main board, <b>“712 MAIN BOARD-RK V0.21, 2023/6/17”</b>. Every label below is printed on the board itself.</p>
   <figure class="map">
     <div class="scroll"><svg viewBox="0 0 880 430" role="img" aria-label="Diagram of the Go2 main board: core board in the centre, radios on the left, four leg buses and the battery on the right">
       <defs><style>
@@ -173,7 +228,7 @@ tr:last-child td{border-bottom:0}
         .k{fill:#5b6373;font:500 10.5px system-ui,sans-serif;letter-spacing:.08em}
         .ln{stroke:#3a4252;stroke-width:1.4;fill:none}
         .lg{stroke:#c084fc;stroke-width:1.6;fill:none}
-        .hid{fill:#16130a;stroke:#5a4513;stroke-width:1.2}
+        .hid{fill:#1a0f10;stroke:#7a2e2e;stroke-width:1.2}
       </style></defs>
       <rect x="300" y="120" width="280" height="190" rx="12" class="core"/>
       <text x="440" y="150" text-anchor="middle" class="k">PLUG-IN CORE BOARD</text>
@@ -200,113 +255,117 @@ tr:last-child td{border-bottom:0}
       <rect x="640" y="354" width="220" height="50" rx="10" class="bx"/><text x="654" y="376" class="t">Ethernet · CHG · STOP</text><text x="654" y="394" class="s">“712 ETH FPC 2023/5/9”</text>
       <path class="ln" d="M610 270 V379 M580 270 H610 M610 314 H640 M610 379 H640"/>
     </svg></div>
-    <figcaption>Amber boxes: radio boards whose chip markings Unitree ground off (the core board and the leg drivers were treated the same way; see below). Source: FCC ID 2A5PE-YUSHU004, internal photos pages 2, 4 and 8.</figcaption>
+    <figcaption>Red boxes: radio boards whose chip markings Unitree ground off (the core board and the leg drivers were treated the same way).</figcaption>
   </figure>
 
   <h2>Every part, and how sure we are</h2>
-  <p><b>Read</b> means the name is printed on the part and legible in the photo. <b>Matched</b> means it is not legible on the Go2 but is identified another way, explained on the card.</p>
-
+  <p class="sub"><b>Read</b>: the name is printed on the part and legible. <b>Matched</b>: not legible on the Go2, identified another way. <b>Ground blank</b>: Unitree removed the marking. <b>Inferred</b>: our best reading, explained.</p>
+  <div class="parts">
   <article class="part" id="p-brain">
     <h3>The brain: Rockchip RK3588S core board <span class="conf m">Matched</span></h3>
-    <p>A plug-in computer board, <b>XF_RK_Core_Board_V10</b>, sits on the main board under an aluminium heatsink with copper heat pipes and a blower fan. It holds the main processor, its memory, its storage and a power-management chip. On the Go2 every chip top has been ground blank, but the board is silkscreened <b>“8+64G”</b>, i.e. 8 GB of memory and 64 GB of storage.</p>
-    <p><b>How we know it is an RK3588S:</b> the identical board, with the same name, layout and “8+64G” label, appears in Unitree's 2025 humanoid filing (FCC ID 2A5PE-YUSHU008) with its markings intact: <b>Rockchip RK3588S</b>, two <b>Biwin BWMZCX32H2A-32G-X</b> memory chips, <b>Biwin BWCTAKJ11X64G</b> 64 GB storage and a Rockchip power-management chip. So the Go2 and the humanoid share one brain.</p>
-    <ul><li>RK3588S: 4× Cortex-A76 + 4× Cortex-A55, 6 TOPS neural accelerator, built for cameras and on-device AI.</li><li>The Go2 EDU can add an NVIDIA Jetson on top; the unit in this filing is the standard computer.</li></ul>
-    <p class="src">Go2: pages 2, 4, 8 · Humanoid: <a href="https://fccid.io/2A5PE-YUSHU008" rel="nofollow noopener" target="_blank">2A5PE-YUSHU008</a>, page 10</p>
+    <p>A plug-in computer board, <b>XF_RK_Core_Board_V10</b>, sits on the main board under an aluminium heatsink with copper heat pipes and a blower fan. It holds the processor, its memory, its storage and a power chip. On the Go2 every chip top is ground blank, but the board is silkscreened <b>“8+64G”</b>: 8 GB of memory, 64 GB of storage.</p>
+    <p><b>How we know it is an RK3588S:</b> the identical board, same name, layout and “8+64G” label, turns up in Unitree's 2025 humanoid with its markings intact: <b>Rockchip RK3588S</b>, two <b>Biwin BWMZCX32H2A-32G-X</b> memory chips, <b>Biwin BWCTAKJ11X64G</b> storage and a Rockchip power chip. The Go2 and the humanoid share one brain.</p>
+    <ul><li>RK3588S: 4× Cortex-A76 + 4× Cortex-A55, 6 TOPS neural accelerator, built for cameras and on-device AI.</li></ul>
+    <button class="see" type="button" data-part="brain">See it in 3D ↑</button>
   </article>
-
   <article class="part" id="p-4g">
-    <h3>4G: Quectel EG25-G module <span class="conf h">Read</span></h3>
-    <p>A standard M.2 cellular card, labelled on its shield with FCC ID <b>XMR201903EG25G</b>. The lab opened the shield: inside are a <b>Qualcomm MDM9207</b> modem, <b>Nanya NM1282KSLAXAL-3B</b> memory, a <b>Qualcomm WTR2965</b> radio transceiver and two <b>Qorvo</b> power amplifiers (77031, 77033).</p>
-    <p><b>Why it is there.</b> It lets the dog be reached from the phone app when it is far from home Wi-Fi.</p>
-    <p class="src">Pages 5–7</p>
+    <h3>4G: Quectel EG25-G <span class="conf h">Read</span></h3>
+    <p>A standard 4G card pushed into a <b>mini PCIe</b> socket on the main board. Under its shield: a <b>Qualcomm MDM9207</b> modem, <b>Nanya NM1282KSLAXAL-3B</b> memory, a <b>Qualcomm WTR2965</b> transceiver and two <b>Qorvo</b> power amplifiers (77031, 77033).</p>
+    <p><b>Why it is there.</b> It lets the dog be reached from the phone app away from home Wi-Fi.</p>
+    <button class="see" type="button" data-part="4g">See it in 3D ↑</button>
   </article>
-
   <article class="part" id="p-wifi">
     <h3>Wi-Fi 6 and Bluetooth: Realtek RTL8852BU <span class="conf h">Read</span></h3>
-    <p>A soldered-down module, labelled <b>BL-M8852BU1</b> (an LB-Link part), carries the <b>Realtek RTL8852BU</b>: dual-band Wi-Fi 6 plus Bluetooth over USB. Two antenna cables, marked “Wi-Fi chain 0” and “chain 1”, go to <b>Rainsun</b> antennas. The phone app and controller connect here.</p>
-    <p class="src">Pages 2, 3, 10, 41</p>
+    <p>A module labelled <b>BL-M8852BU1</b> (an LB-Link part) carries the <b>Realtek RTL8852BU</b>: dual-band Wi-Fi 6 plus Bluetooth over USB. Two antenna cables, “chain 0” and “chain 1”, go to <b>Rainsun</b> antennas. The phone app and controller connect here.</p>
+    <button class="see" type="button" data-part="wifi">See it in 3D ↑</button>
   </article>
-
   <article class="part" id="p-radio">
-    <h3>Remote-control radio board “YS.PPRF” <span class="conf m">Partly read</span></h3>
-    <p>A separate radio board, silkscreened <b>YS.PPRF 23</b>, with a <b>2401C</b> 2.4 GHz front-end amplifier and a crystal. Its two main chips have had their markings ground off. A separate <b>LoRa</b> antenna cable is also listed, so the dog has a long-range, low-bandwidth link in addition to Wi-Fi.</p>
-    <p class="src">Pages 9, 42</p>
+    <h3>Remote-control radio “YS.PPRF” <span class="conf x">Ground blank</span></h3>
+    <p>A separate radio board, silkscreened <b>YS.PPRF 23</b>, with a <b>2401C</b> 2.4 GHz front-end amplifier and two crystals. Its two main chips have had their markings ground off. A separate <b>LoRa</b> antenna is fitted too, so the dog has a slow, long-range link as well as Wi-Fi.</p>
+    <button class="see" type="button" data-part="radio">See it in 3D ↑</button>
   </article>
-
   <article class="part" id="p-uwb">
-    <h3>UWB positioning board <span class="conf m">Chips hidden</span></h3>
-    <p>A gold-coloured board with <b>four UWB antennas</b>, the hardware behind the Go2's “follow me” mode: ultra-wideband radio measures the exact distance and angle to the handheld remote. The lab labels the main chip “UWB chip”. Unitree ground its markings off, along with the amplifiers beside it.</p>
-    <p class="src">Pages 35–38</p>
+    <h3>UWB positioning board <span class="conf x">Ground blank</span></h3>
+    <p>A clover-shaped gold board with <b>four UWB antennas</b>: the hardware behind “follow me”. Ultra-wideband pulses measure the exact distance and angle to the handheld remote. The ranging chip, its controller and the amplifiers beside them all had their markings ground off.</p>
+    <button class="see" type="button" data-part="uwb">See it in 3D ↑</button>
   </article>
-
   <article class="part" id="p-motors">
     <h3>Twelve leg motors, each with its own driver <span class="conf h">Read</span></h3>
-    <p>Each leg has three joints (hip side-swing, hip, knee), and every joint is a flat <b>outrunner brushless motor</b>. A round driver board, silkscreened <b>“M12_MDRV_V1.9.1 · 2023/5/10 · Unitree”</b>, sits inside the joint with its power transistors, capacitors and an 8-pin chip in the centre. A small star-shaped board, most likely the position sensor, sits at the centre of the joint. The main board only sends commands down one bus per leg (FR, FL, RL, RR); the high current never leaves the joint.</p>
-    <ul><li>The lab opened every leg: stator windings, magnet rings and the driver boards are all photographed.</li><li>The centre chip on the driver board has had its markings removed.</li></ul>
-    <p class="src">Pages 11–31, 48–68</p>
+    <p>Three joints per leg (hip side-swing, hip, knee), each a flat <b>outrunner brushless motor</b> in a finned aluminium housing. A round driver board, silkscreened <b>“M12_MDRV_V1.9.1 · 2023/5/10 · Unitree”</b>, sits inside the joint with its power transistors and capacitors; a small star-shaped board, most likely the position sensor, sits at the centre. The main board only sends commands down one bus per leg; the high current never leaves the joint.</p>
+    <ul><li>The centre chip on the driver board has had its marking removed.</li></ul>
+    <button class="see" type="button" data-part="motors">See it in 3D ↑</button>
   </article>
-
   <article class="part" id="p-lidar">
-    <h3>A second small motor board, “LD BOT V0.2.6” <span class="conf m">Board read, role inferred</span></h3>
-    <p>A compact brushless motor, about 5 cm across, paired with a board marked <b>“LD BOT V0.2.6 By Unitree”</b>. It is far smaller than the leg motors. The main board has a port labelled <b>LIDAR</b>, and the Go2 carries a spinning 4D LiDAR in its head, so this is most likely the motor that spins it. That is an inference; the filing does not say.</p>
-    <p class="src">Pages 23–28</p>
+    <h3>A small motor board, “LD BOT V0.2.6” <span class="conf i">Inferred</span></h3>
+    <p>A compact brushless motor, about 5 cm across, paired with a board marked <b>“LD BOT V0.2.6 By Unitree”</b>. It is far smaller than the leg motors. The main board has a port labelled <b>LIDAR</b> and the Go2 carries a spinning LiDAR under its chin, so this is most likely the motor that turns it. That is our reading; nothing on the part says so.</p>
+    <button class="see" type="button" data-part="lidar">See it in 3D ↑</button>
   </article>
-
   <article class="part" id="p-fans">
     <h3>Cooling: two 12 V blower fans <span class="conf h">Read</span></h3>
-    <p>Small DC brushless blowers from <b>Shenzhen Zhuoming Electronics</b>, 12 V. One sits beside the core board's heatsink; a second one is in the body.</p>
-    <p class="src">Pages 2, 4, 5, 45</p>
+    <p>Small DC brushless blowers from <b>Shenzhen Zhuoming Electronics</b>, 12 V. One sits beside the core board's heatsink and pushes air along its heat pipes; a second is in the body.</p>
+    <button class="see" type="button" data-part="fans">See it in 3D ↑</button>
   </article>
+  </div>
 
   <h2>What Unitree hides</h2>
   <div class="callout">
-    <p>On four boards, the processor, the motor-driver chip, the UWB chip and the remote radio's chips, the printed part numbers have been <b>physically ground off</b> before the robot went to the lab. Everything bought in as a finished module (the 4G card, the Wi-Fi module) was left readable. It is a common way to slow down copycats, and it is why the processor above is identified by matching boards rather than read directly.</p>
+    <div class="ico" aria-hidden="true"></div>
+    <p>On four boards (the processor, the motor-driver chip, the UWB chips and the remote radio's chips) the printed part numbers were <b>physically ground off</b> before the robot left the factory for testing. Everything bought in as a finished module, the 4G card and the Wi-Fi module, was left readable. It is a common way to slow down copycats, and it is why the processor is identified by matching boards rather than read directly. In the 3D parts above, ground chips are drawn blank with their grinding marks; toggle the core board to see what its chips say on the humanoid.</p>
   </div>
 
   <h2>All parts in one table</h2>
   <div class="tablewrap"><table>
-    <thead><tr><th>Part</th><th>What is printed on it</th><th>Role</th><th>Sure?</th><th>Page</th></tr></thead>
+    <thead><tr><th>Part</th><th>What is printed on it</th><th>Role</th><th>Sure?</th></tr></thead>
     <tbody>
-      <tr><td>Main board</td><td>712 MAIN BOARD-RK V0.21, 2023/6/17</td><td>Connects everything</td><td>Read</td><td>8</td></tr>
-      <tr><td>Core board</td><td>XF_RK_Core_Board_V10, 8+64G</td><td>Main computer</td><td>Read</td><td>8</td></tr>
-      <tr><td>Processor</td><td>(ground blank) · RK3588S on the identical humanoid board</td><td>Runs walking, vision, app</td><td>Matched</td><td>8</td></tr>
-      <tr><td>4G module</td><td>Quectel EG25-G, FCC ID XMR201903EG25G</td><td>Mobile data</td><td>Read</td><td>6</td></tr>
-      <tr><td>Modem chip</td><td>Qualcomm MDM9207</td><td>Inside the 4G module</td><td>Read</td><td>7</td></tr>
-      <tr><td>Modem memory</td><td>Nanya NM1282KSLAXAL-3B</td><td>Inside the 4G module</td><td>Read</td><td>7</td></tr>
-      <tr><td>RF transceiver</td><td>Qualcomm WTR2965</td><td>Inside the 4G module</td><td>Read</td><td>7</td></tr>
-      <tr><td>Power amplifiers</td><td>Qorvo 77031, 77033</td><td>Inside the 4G module</td><td>Read</td><td>7</td></tr>
-      <tr><td>Wi-Fi module</td><td>LB-Link BL-M8852BU1</td><td>Wi-Fi 6 + Bluetooth</td><td>Read</td><td>8</td></tr>
-      <tr><td>Wi-Fi chip</td><td>Realtek RTL8852BU</td><td>Inside the Wi-Fi module</td><td>Read</td><td>10</td></tr>
-      <tr><td>Remote radio</td><td>YS.PPRF 23, 2401C front end</td><td>Controller link</td><td>Partly</td><td>9</td></tr>
-      <tr><td>UWB board</td><td>(chips ground blank)</td><td>Follow-me positioning</td><td>Hidden</td><td>38</td></tr>
-      <tr><td>Leg motor driver ×12</td><td>M12_MDRV_V1.9.1, 2023/5/10</td><td>Drives one joint</td><td>Read</td><td>14</td></tr>
-      <tr><td>Small motor board</td><td>LD BOT V0.2.6</td><td>Likely LiDAR spin motor</td><td>Inferred</td><td>26</td></tr>
-      <tr><td>Ethernet flex</td><td>712 ETH FPC, 2023/5/9</td><td>Wired network port</td><td>Read</td><td>2</td></tr>
-      <tr><td>Blower fans ×2</td><td>Shenzhen Zhuoming, DC 12 V</td><td>Cooling</td><td>Read</td><td>4</td></tr>
-      <tr><td>Antennas</td><td>Rainsun (Wi-Fi), plus LoRa, WWAN, UWB</td><td>Radios</td><td>Read</td><td>41–42</td></tr>
+      <tr><td>Main board</td><td>712 MAIN BOARD-RK V0.21, 2023/6/17</td><td>Connects everything</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Core board</td><td>XF_RK_Core_Board_V10, 8+64G</td><td>Main computer</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Processor</td><td>(ground blank) · RK3588S on the identical humanoid board</td><td>Walking, vision, app</td><td><i class="dot" style="--c:var(--matched)"></i>Matched</td></tr>
+      <tr><td>4G card</td><td>Quectel EG25-G</td><td>Mobile data</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Modem chip</td><td>Qualcomm MDM9207</td><td>Inside the 4G card</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Modem memory</td><td>Nanya NM1282KSLAXAL-3B</td><td>Inside the 4G card</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>RF transceiver</td><td>Qualcomm WTR2965</td><td>Inside the 4G card</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Power amplifiers</td><td>Qorvo 77031, 77033</td><td>Inside the 4G card</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Wi-Fi module</td><td>LB-Link BL-M8852BU1</td><td>Wi-Fi 6 + Bluetooth</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Wi-Fi chip</td><td>Realtek RTL8852BU</td><td>Inside the Wi-Fi module</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Remote radio</td><td>YS.PPRF 23, 2401C front end</td><td>Controller link</td><td><i class="dot" style="--c:var(--hidden)"></i>Partly blank</td></tr>
+      <tr><td>UWB board</td><td>(chips ground blank)</td><td>Follow-me positioning</td><td><i class="dot" style="--c:var(--hidden)"></i>Ground blank</td></tr>
+      <tr><td>Leg motor driver ×12</td><td>M12_MDRV_V1.9.1, 2023/5/10</td><td>Drives one joint</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Small motor board</td><td>LD BOT V0.2.6</td><td>Likely LiDAR spin motor</td><td><i class="dot" style="--c:var(--inferred)"></i>Inferred</td></tr>
+      <tr><td>Ethernet flex</td><td>712 ETH FPC, 2023/5/9</td><td>Wired network port</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Blower fans ×2</td><td>Shenzhen Zhuoming, DC 12 V</td><td>Cooling</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Antennas</td><td>Rainsun (Wi-Fi), plus LoRa, 4G, UWB</td><td>Radios</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
     </tbody>
   </table></div>
 
   <section class="qa">
     <h2>Questions</h2>
-    <details><summary>What processor does the Unitree Go2 use?</summary><p>A Rockchip RK3588S, an 8-core Arm chip with a built-in AI accelerator, on a plug-in core board marked XF_RK_Core_Board_V10 with 8 GB of memory and 64 GB of storage. The chip tops on the Go2 are ground blank, but the same core board appears in Unitree's 2025 humanoid filing with its markings intact.</p></details>
-    <details><summary>Does the Unitree Go2 have 4G?</summary><p>The unit Unitree sent for FCC testing has a Quectel EG25-G 4G LTE module (FCC ID XMR201903EG25G) built on a Qualcomm MDM9207 modem, plugged into an M.2 slot on the main board. It also carries Wi-Fi 6 and Bluetooth (Realtek RTL8852BU), UWB and a separate long-range radio for the remote.</p></details>
+    <details><summary>What processor does the Unitree Go2 use?</summary><p>A Rockchip RK3588S, an 8-core Arm chip with a built-in AI accelerator, on a plug-in core board marked XF_RK_Core_Board_V10 with 8 GB of memory and 64 GB of storage. The chip tops on the Go2 are ground blank, but the same core board appears in Unitree's 2025 humanoid with its markings intact.</p></details>
+    <details><summary>Does the Unitree Go2 have 4G?</summary><p>The unit that was taken apart has a Quectel EG25-G 4G LTE card built on a Qualcomm MDM9207 modem, pushed into a mini PCIe socket on the main board. It also carries Wi-Fi 6 and Bluetooth (Realtek RTL8852BU), UWB and a separate long-range radio for the remote.</p></details>
     <details><summary>How many motors does the Go2 have?</summary><p>Twelve leg motors, three per leg. Each is an outrunner brushless motor with its own round driver board (marked M12_MDRV_V1.9.1, dated 2023/5/10) mounted inside the joint, so the main computer sends commands over a bus instead of driving motor current itself.</p></details>
   </section>
 
-  <h2>Where this comes from</h2>
-  <p>Everything above is read from the internal photographs Unitree (Hangzhou Yushu Technology) filed with the US Federal Communications Commission for FCC ID <b>2A5PE-YUSHU004</b>, tested by China Certification ICT Co., Ltd (Dongguan), report CR231168373-INP. The filing's own user manual is titled “Go2 User Manual”. The photos belong to their owners, so we do not copy them here; open them yourself:</p>
-  <p class="fine">
-    <a href="https://fccid.io/2A5PE-YUSHU004" rel="nofollow noopener" target="_blank">Full filing</a> ·
-    <a href="https://fccid.io/2A5PE-YUSHU004/Internal-Photos/Internal-Photos-Part-1-7349906" rel="nofollow noopener" target="_blank">Photos pages 1–15</a> ·
-    <a href="https://fccid.io/2A5PE-YUSHU004/Internal-Photos/Internal-Photos-Part-2-7349907" rel="nofollow noopener" target="_blank">16–31</a> ·
-    <a href="https://fccid.io/2A5PE-YUSHU004/Internal-Photos/Internal-Photos-Part-3-7349908" rel="nofollow noopener" target="_blank">32–47</a> ·
-    <a href="https://fccid.io/2A5PE-YUSHU004/Internal-Photos/Internal-Photos-Part-4-7349909" rel="nofollow noopener" target="_blank">48–64</a> ·
-    <a href="https://fccid.io/2A5PE-YUSHU004/Internal-Photos/Internal-Photos-Part-5-7349910" rel="nofollow noopener" target="_blank">65–68</a> ·
-    <a href="https://apps.fcc.gov/oetcf/eas/reports/ViewExhibitReport.cfm?mode=Exhibits&amp;RequestTimeout=500&amp;calledFromFrame=N&amp;application_id=&amp;fcc_id=2A5PE-YUSHU004" rel="nofollow noopener" target="_blank">FCC's own copy</a>
-  </p>
+  <p class="fine" style="margin-top:40px">Based on laboratory teardown photographs of a Go2 test unit, May 2024. The photos are not reproduced here; every part above is redrawn, and sizes are approximate. Production units may differ. Not affiliated with Unitree. Spotted a mistake? Tell us and we will fix it.</p>
   <p class="fine">Plain-text version for AI tools: <a href="/ai/unitree-go2.md">/ai/unitree-go2.md</a> &middot; <a href="/ai/llms.txt">all references</a></p>
-  <p class="fine">Not affiliated with Unitree. Part names are what is printed on the parts; roles are our explanation. A later production Go2 may differ from the unit that was tested. Spotted a mistake? Tell us and we will fix it.</p>
 </main>
+<script>
+// Load the 3D only when it is about to be seen; the text never waits on it.
+(function () {
+  var started = false, go = function () { if (!started) { started = true; import('/inside/unitree-go2/js/go2.js') } }
+  var els = [document.getElementById('go2-3d'), document.getElementById('parts-3d')]
+  if (!('IntersectionObserver' in window)) return go()
+  var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting })) { io.disconnect(); go() } }, { rootMargin: '400px' })
+  els.forEach(function (e) { io.observe(e) })
+  // "See it in 3D" buttons on the part cards open that part on the bench.
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.see')
+    if (!b) return
+    go()
+    document.getElementById('parts').scrollIntoView({ behavior: 'smooth' })
+    var tries = 0, t = setInterval(function () {
+      if (window.__bench) { clearInterval(t); window.__bench.show(b.dataset.part) } else if (++tries > 100) clearInterval(t)
+    }, 100)
+  })
+})()
+</script>
 </body>
 </html>
