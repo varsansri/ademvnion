@@ -7,3 +7,7 @@ so101/raw/
 so101/glb/
 so101/scene.glb
 __pycache__/
+
+# Go2: raw OBJs from MuJoCo Menagerie, rebuilt by build_go2.py
+go2/assets/
+go2/scene.glb
