@@ -12,6 +12,11 @@
   Link: <https://ademvnion.com/inside/so-arm101/>; rel="canonical"
   Cache-Control: public, max-age=3600
 
+/ai/unitree-go2.md
+  Content-Type: text/markdown; charset=utf-8
+  Link: <https://ademvnion.com/inside/unitree-go2/>; rel="canonical"
+  Cache-Control: public, max-age=3600
+
 /ai/inside.md
   Content-Type: text/markdown; charset=utf-8
   Link: <https://ademvnion.com/inside/>; rel="canonical"

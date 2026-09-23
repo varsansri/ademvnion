@@ -1,16 +1,16 @@
 # Inside real robots — interactive teardowns
 
 Canonical page: https://ademvnion.com/inside/  
-Updated: 2026-09-22  
+Updated: 2026-09-24  
 Publisher: Adem (ademvnion.com)
 
 ## What it is
 
-The index of Ademvnion's robot teardowns. Only robots whose CAD and bill of materials are published openly are taken apart here, so every part shown is the real one.
+The index of Ademvnion's robot teardowns. Open-hardware robots are taken apart in 3D from their published CAD; commercial robots are read from the internal photographs their makers must file with the US FCC.
 
 ## Facts
 
-- Teardowns published so far: the SO-ARM101.
+- Teardowns published so far: the SO-ARM101 (3D, from open CAD) and the Unitree Go2 (from its FCC filing).
 - Each teardown is built from the project's own CAD and URDF, not from redrawn models.
 - Runs in a browser with no account. Parts can be hidden, the assembly exploded, the joints moved.
 

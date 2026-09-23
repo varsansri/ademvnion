@@ -1,7 +1,7 @@
 # Inside the SO-ARM101 — every part of an open-source robot arm
 
 Canonical page: https://ademvnion.com/inside/so-arm101/  
-Updated: 2026-09-22  
+Updated: 2026-09-24  
 Publisher: Adem (ademvnion.com)
 
 ## What it is
