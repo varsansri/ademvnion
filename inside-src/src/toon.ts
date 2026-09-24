@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
+import { buildMower, buildVacuum, go1Inside, g1Inside, light } from './rebuilt'
 
 // The 3D view on every photo-teardown page (/inside/<slug>/). (The file keeps
 // its first name, toon.ts, from a cartoon-shaded version he turned down: it is
@@ -17,12 +18,13 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 // the inside parts; status is shown by pin shape, never by colour.
 
 type Shape = 'h' | 'm' | 'x' | 'i' | 'n'
-interface Pin { n: number; part: string; name: string; text: string; status: Shape; at: number[]; body?: string; box?: number[] }
+interface Pin { n: number; part: string; name: string; text: string; status: Shape; at?: number[]; body?: string }
 interface Cfg { slug: string; kind: 'menagerie' | 'mower' | 'vacuum'; play: string; view: number[]; pins: Pin[] }
 interface Robot {
   group: THREE.Group
   shell: THREE.Material[]                       // faded in X-ray
   inner: THREE.Object3D[]                       // shown in X-ray
+  parts: Map<string, THREE.Object3D>            // part id -> its rebuilt 3D object (pins find it, picks light it)
   anchor: (body?: string) => THREE.Object3D
   tick: (t: number, playing: boolean) => boolean // true when something moved
 }
@@ -41,11 +43,10 @@ const mat = (color: THREE.ColorRepresentation, finish: Finish, shell?: THREE.Mat
   shell?.push(m)
   return m
 }
-const INNER_GLOW = 0.3, PICKED_GLOW = 1.1
-const innerMat = () => new THREE.MeshStandardMaterial({ color: ACCENT, emissive: ACCENT, emissiveIntensity: INNER_GLOW, roughness: 0.4, metalness: 0.1 })
 
 async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
-  const robot = cfg.kind === 'menagerie' ? await menagerie(cfg) : cfg.kind === 'mower' ? mower(cfg) : vacuum(cfg)
+  const robot: Robot = cfg.kind === 'menagerie' ? await menagerie(cfg)
+    : { ...(cfg.kind === 'mower' ? buildMower() : buildVacuum()), anchor: function (this: void) { return robot.group } }
   stage.querySelector('.load')?.remove()
 
   const small = matchMedia('(max-width: 900px)').matches
@@ -64,6 +65,7 @@ async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
   scene.environmentIntensity = 0.55
   pmrem.dispose()
   scene.add(robot.group)
+  for (const o of robot.inner) o.visible = false
   robot.group.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh && !m.userData.noShadow) m.castShadow = true })
   scene.add(new THREE.HemisphereLight('#dfe7ff', '#0b0d12', 0.9))
   const sun = new THREE.DirectionalLight('#ffffff', 2.4)
@@ -72,7 +74,7 @@ async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
   // Frame the robot from its own size, looking from cfg.view.
   scene.updateMatrixWorld(true)
   const bb = new THREE.Box3()
-  robot.group.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh && m.visible) bb.expandByObject(m) })
+  robot.group.traverseVisible(o => { const m = o as THREE.Mesh; if (m.isMesh) bb.expandByObject(m) })
   const sphere = bb.getBoundingSphere(new THREE.Sphere())
   const FOV = 30
   const camera = new THREE.PerspectiveCamera(FOV, 1, sphere.radius * 0.05, sphere.radius * 20)
@@ -97,23 +99,25 @@ async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.target.copy(HOME_TGT)
   controls.enableDamping = true
-  controls.enableZoom = false                             // the wheel belongs to the page
+  controls.enableZoom = false                             // the wheel belongs to the page...
   controls.enablePan = false
-  controls.minPolarAngle = 0.25
-  controls.maxPolarAngle = 1.62
+  controls.minPolarAngle = 0.2
+  controls.maxPolarAngle = cfg.kind === 'menagerie' ? 1.75 : 2.6   // mower and vacuum: turn them over
+  controls.minDistance = dist * 0.08
+  controls.maxDistance = dist * 1.8
+  // ...until you click the model: then the wheel (or a pinch) zooms in to read the chips.
+  renderer.domElement.addEventListener('pointerdown', () => { controls.enableZoom = true })
+  root.addEventListener('mouseleave', () => { controls.enableZoom = false })
 
-  // --- inside parts: shown in X-ray, one colour ---
-  for (const o of robot.inner) o.visible = false
-  const boxFor = new Map<string, THREE.Mesh>()
+  // --- where each pin sits: on top of its rebuilt part, or at a fixed point ---
+  robot.group.updateMatrixWorld(true)
+  const pinObj = new Map<number, { obj: THREE.Object3D; local: THREE.Vector3; r: number }>()
   for (const p of cfg.pins) {
-    if (!p.box) continue
-    const m = new THREE.Mesh(new RoundedBoxGeometry(p.box[0], p.box[1], p.box[2], 2, Math.min(...p.box) * 0.35), innerMat())
-    m.position.fromArray(p.at)
-    m.visible = false
-    m.userData.noShadow = true
-    robot.anchor(p.body).add(m)
-    robot.inner.push(m)
-    boxFor.set(p.part, m)
+    const obj = robot.parts.get(p.part)
+    if (!obj || p.at) continue
+    const bb = new THREE.Box3().setFromObject(obj, true)
+    const c = bb.getCenter(new THREE.Vector3()); c.z = bb.max.z
+    pinObj.set(p.n, { obj, local: obj.worldToLocal(c.clone()), r: bb.getBoundingSphere(new THREE.Sphere()).radius })
   }
 
   // --- pins: numbered buttons that follow their 3D point; shape = status ---
@@ -136,7 +140,10 @@ async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
     li.querySelector('button')!.addEventListener('click', () => select(p.n))
     list.appendChild(li)
   }
-  const worldOf = (p: Pin, out: THREE.Vector3) => robot.anchor(p.body).localToWorld(out.fromArray(p.at))
+  const worldOf = (p: Pin, out: THREE.Vector3) => {
+    const o = pinObj.get(p.n)
+    return o ? o.obj.localToWorld(out.copy(o.local)) : robot.anchor(p.body).localToWorld(out.fromArray(p.at ?? [0, 0, 0]))
+  }
 
   const LABEL: Record<Shape, string> = { h: 'Read', m: 'Matched', x: 'Ground blank', i: 'Inferred', n: 'Not visible' }
   let selected: number | null = null
@@ -145,8 +152,8 @@ async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
     const p = cfg.pins.find(x => x.n === selected)
     pinFor.forEach((b, k) => b.classList.toggle('on', k === selected))
     list.querySelectorAll('button').forEach(b => b.classList.toggle('on', Number(b.dataset.n) === selected))
-    boxFor.forEach((m, part) => { (m.material as THREE.MeshStandardMaterial).emissiveIntensity = p && p.part === part ? PICKED_GLOW : INNER_GLOW })
-    if (p && p.box && !xray) setXray(true)
+    robot.parts.forEach((o, part) => light(o, !!p && p.part === part))
+    if (p && robot.parts.has(p.part) && !xray) setXray(true)
     focus(p ?? null)
     info.innerHTML = p
       ? `<p class="k"><span class="chip"><i class="st ${p.status}"></i>${LABEL[p.status]}</span> Part ${p.n}</p><h3>${p.name}</h3><p>${p.text}</p><p><a href="#p-${p.part}">Full details ↓</a></p>`
@@ -160,7 +167,10 @@ async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
     if (!p) { goal = { pos: HOME_CAM.clone(), tgt: HOME_TGT.clone() }; return }
     const at = worldOf(p, new THREE.Vector3())
     const dir = camera.position.clone().sub(controls.target).normalize()
-    goal = { pos: at.clone().addScaledVector(dir, dist * 0.62), tgt: at }
+    const near = pinObj.get(p.n)
+    // Close enough to read the markings on a board; further back for big parts.
+    const d = near ? Math.max(near.r * 3.2, dist * 0.12) : dist * 0.62
+    goal = { pos: at.clone().addScaledVector(dir, d), tgt: at }
   }
 
   // --- X-ray ---
@@ -170,7 +180,7 @@ async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
     xray = on
     for (const o of robot.inner) o.visible = on
     for (const m of robot.shell) {
-      m.transparent = on
+      m.transparent = on || !!m.userData.alwaysTransparent
       m.opacity = on ? 0.14 : 1
       m.depthWrite = !on
       m.needsUpdate = true
@@ -322,8 +332,11 @@ async function menagerie(cfg: Cfg): Promise<Robot> {
   const isDog = joints.has('FR_thigh_joint')
   let wasPlaying = false
 
+  const bodies = data.bodies.map(b => ({ name: b.name, joint: b.joint }))
+  const inside = cfg.slug === 'unitree-go1' ? go1Inside(pivots, bodies) : g1Inside(pivots, bodies)
+
   return {
-    group, shell, inner: [],
+    group, shell, inner: inside.inner, parts: inside.parts,
     anchor: body => (body && pivots.get(body)) || pivots.get(first.name)!,
     tick: (t, playing) => {
       if (!playing && !wasPlaying) {
@@ -359,195 +372,8 @@ async function menagerie(cfg: Cfg): Promise<Robot> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Robot lawn mower (Segway Navimow X3): an approximate shape, metres, Z-up,
-// X forward. Body about 0.70 x 0.50 m; boards and battery sized from the photos.
-function mower(cfg: Cfg): Robot {
-  const group = new THREE.Group(), shell: THREE.Material[] = [], inner: THREE.Object3D[] = []
-  const BODY = mat('#2f333a', 'plastic', shell), TOP = mat('#474d57', 'gloss', shell), BLACK = mat('#1c1f24', 'gloss', shell)
-  const TYRE = mat('#e5692a', 'rubber', shell), HUB = mat('#2a2e35', 'metal', shell), GLASS = mat('#0e1216', 'glass', shell)
-  const STEEL = mat('#c9ced6', 'metal', shell)
-
-  const chassis = new THREE.Mesh(new RoundedBoxGeometry(0.6, 0.42, 0.14, 4, 0.05), BODY)
-  chassis.position.set(0.02, 0, 0.13)
-  const cover = new THREE.Mesh(new RoundedBoxGeometry(0.5, 0.36, 0.07, 4, 0.03), TOP)
-  cover.position.set(0.0, 0, 0.215)
-  const nose = new THREE.Mesh(new RoundedBoxGeometry(0.16, 0.34, 0.11, 4, 0.04), BODY)
-  nose.position.set(0.3, 0, 0.12)
-  // Front camera module with two lenses.
-  const cam = new THREE.Mesh(new RoundedBoxGeometry(0.07, 0.2, 0.06, 3, 0.02), BLACK)
-  cam.position.set(0.28, 0, 0.27)
-  const lensGeo = new THREE.CylinderGeometry(0.014, 0.014, 0.012, 20)
-  for (const y of [-0.05, 0.05]) {
-    const lens = new THREE.Mesh(lensGeo, GLASS)
-    lens.rotation.z = Math.PI / 2
-    lens.position.set(0.318, y, 0.275)
-    group.add(lens)
-  }
-  const stop = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.02, 28), BLACK)
-  stop.rotation.x = Math.PI / 2
-  stop.position.set(-0.08, 0, 0.255)
-  group.add(chassis, cover, nose, cam, stop)
-
-  // Big rear drive wheels with chunky treads, small front casters.
-  const wheels: THREE.Group[] = []
-  const tyreGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.075, 36)
-  const lugGeo = new THREE.BoxGeometry(0.03, 0.08, 0.02)
-  for (const y of [-0.27, 0.27]) {
-    const w = new THREE.Group()
-    const tyre = new THREE.Mesh(tyreGeo, TYRE)
-    w.add(tyre)
-    for (let i = 0; i < 14; i++) {
-      const lug = new THREE.Mesh(lugGeo, TYRE)
-      const a = (i / 14) * Math.PI * 2
-      lug.position.set(Math.cos(a) * 0.135, 0, Math.sin(a) * 0.135)
-      lug.rotation.y = -a
-      w.add(lug)
-    }
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.08, 24), HUB)
-    w.add(hub)
-    w.position.set(-0.17, y, 0.13)
-    group.add(w)
-    wheels.push(w)
-  }
-  for (const y of [-0.15, 0.15]) {
-    const c = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.04, 20), BLACK)
-    c.position.set(0.28, y, 0.045)
-    group.add(c)
-  }
-  // Blade disc under the middle.
-  const blade = new THREE.Group()
-  const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.01, 32), HUB)
-  disc.rotation.x = Math.PI / 2                     // cylinder axis Y -> Z (flat disc)
-  blade.add(disc)
-  for (let i = 0; i < 3; i++) {
-    const b = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.018, 0.004), STEEL)
-    const a = (i / 3) * Math.PI * 2
-    b.position.set(Math.cos(a) * 0.12, Math.sin(a) * 0.12, 0)
-    b.rotation.z = a
-    blade.add(b)
-  }
-  blade.position.set(0.03, 0, 0.04)
-  group.add(blade)
-
-  // Inside, shown in X-ray: the two boards, the battery, the three motors.
-  const INNER = innerMat()
-  const board = (x: number, y: number, z: number, sx: number, sy: number) => {
-    const m = new THREE.Mesh(new RoundedBoxGeometry(sx, sy, 0.004, 2, 0.0015), INNER)
-    m.position.set(x, y, z); inner.push(m); group.add(m); return m
-  }
-  board(0.17, 0, 0.19, 0.15, 0.075)                  // Chameleon_cpu
-  board(-0.1, 0, 0.12, 0.24, 0.17)                   // Chameleon_DRIVER_HP
-  const batt = new THREE.Mesh(new RoundedBoxGeometry(0.16, 0.1, 0.07, 3, 0.01), INNER)
-  batt.position.set(0.05, 0, 0.1); inner.push(batt); group.add(batt)
-  for (const y of [-0.2, 0.2]) {
-    const mot = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.06, 20), INNER)
-    mot.position.set(-0.17, y, 0.13); inner.push(mot); group.add(mot)
-  }
-  const bm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.06, 20), INNER)
-  bm.rotation.x = Math.PI / 2
-  bm.position.set(0.03, 0, 0.08); inner.push(bm); group.add(bm)
-
-  let spin = 0, last = 0
-  return {
-    group, shell, inner,
-    anchor: () => group,
-    tick: (t, playing) => {
-      const dt = Math.min(0.05, t - last); last = t
-      if (!playing) return false
-      spin += dt
-      for (const w of wheels) w.rotation.y = spin * 3
-      blade.rotation.z = spin * 28
-      return true
-    },
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Robot vacuum (Roborock Qrevo Curv 2 Flow): an approximate shape, 0.35 m
-// across, LiDAR turret on top, roller mop at the back.
-function vacuum(cfg: Cfg): Robot {
-  const group = new THREE.Group(), shell: THREE.Material[] = [], inner: THREE.Object3D[] = []
-  const WHITE = mat('#eef0f3', 'gloss', shell), GREY = mat('#8d939c', 'plastic', shell), DARK = mat('#1d2026', 'gloss', shell), MOP = mat('#d3d7dd', 'rubber', shell)
-
-  // Body: a lathe profile gives the soft rounded rim.
-  const prof = [[0, 0.012], [0.165, 0.012], [0.175, 0.03], [0.176, 0.07], [0.168, 0.088], [0.14, 0.095], [0, 0.095]]
-    .map(([r, z]) => new THREE.Vector2(r, z))
-  const body = new THREE.Mesh(new THREE.LatheGeometry(prof, 64), WHITE)
-  body.rotation.x = Math.PI / 2
-  group.add(body)
-  // Front bumper band: an open arc centred on +X (theta = PI/2 is local +X).
-  const BUMP = mat('#8d939c', 'plastic', shell)
-  BUMP.side = THREE.DoubleSide
-  const bumper = new THREE.Mesh(new THREE.CylinderGeometry(0.178, 0.178, 0.045, 64, 1, true, Math.PI * 0.08, Math.PI * 0.84), BUMP)
-  bumper.rotation.x = Math.PI / 2
-  bumper.position.z = 0.045
-  group.add(bumper)
-  // LiDAR turret, forward of centre; it spins.
-  const turret = new THREE.Group()
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.043, 0.043, 0.03, 40), DARK)
-  cap.rotation.x = Math.PI / 2
-  turret.add(cap)
-  const win = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.03, 0.012), GREY)
-  win.position.set(0.042, 0, 0)
-  turret.add(win)
-  turret.position.set(0.06, 0, 0.112)
-  group.add(turret)
-  // Wheels, side brush, roller mop.
-  for (const y of [-0.12, 0.12]) {
-    const w = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 0.022, 24), DARK)
-    w.position.set(0.0, y, 0.03)
-    group.add(w)
-  }
-  const brush = new THREE.Group()
-  for (let i = 0; i < 4; i++) {
-    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.004, 0.002), DARK)
-    arm.position.x = 0.0225
-    const holder = new THREE.Group()
-    holder.rotation.z = (i / 4) * Math.PI * 2
-    holder.add(arm)
-    brush.add(holder)
-  }
-  brush.position.set(0.13, -0.1, 0.01)
-  group.add(brush)
-  const roller = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.27, 28), MOP)
-  roller.position.set(-0.11, 0, 0.022)
-  group.add(roller)
-
-  // Inside, shown in X-ray: U-shaped main board, battery, fan, LiDAR board.
-  const INNER = innerMat()
-  const u = new THREE.Shape()
-  u.moveTo(-0.11, -0.05); u.lineTo(0.11, -0.05); u.lineTo(0.11, 0.07); u.lineTo(0.05, 0.07); u.lineTo(0.05, 0.0)
-  u.lineTo(-0.05, 0.0); u.lineTo(-0.05, 0.07); u.lineTo(-0.11, 0.07); u.closePath()
-  const main = new THREE.Mesh(new THREE.ExtrudeGeometry(u, { depth: 0.003, bevelEnabled: false }), INNER)
-  main.rotation.z = -Math.PI / 2
-  main.position.set(0.0, 0, 0.07)
-  const batt = new THREE.Mesh(new RoundedBoxGeometry(0.09, 0.07, 0.065, 3, 0.008), INNER)
-  batt.position.set(-0.01, 0, 0.045)
-  const fan = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.045, 28), INNER)
-  fan.rotation.x = Math.PI / 2
-  fan.position.set(-0.075, 0.07, 0.05)
-  const lb = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.004, 28), INNER)
-  lb.rotation.x = Math.PI / 2
-  lb.position.set(0.06, 0, 0.098)
-  for (const m of [main, batt, fan, lb]) { inner.push(m); group.add(m) }
-
-  let spin = 0, last = 0
-  return {
-    group, shell, inner,
-    anchor: () => group,
-    tick: (t, playing) => {
-      const dt = Math.min(0.05, t - last); last = t
-      spin += dt
-      turret.rotation.z = spin * (playing ? 9 : 1.2)   // the LiDAR always turns a little
-      if (playing) { brush.rotation.z = -spin * 14; roller.rotation.y = spin * 10 }
-      return true
-    },
-  }
-}
-
 // Start last: the mower and vacuum are built synchronously, so every constant
-// above (FINISH, mat, innerMat) must exist before main() runs.
+// above (FINISH, mat) must exist before main() runs.
 const rootEl = document.getElementById('toon-3d')
 const stageEl = document.getElementById('toonstage')
 const dataEl = document.getElementById('toon-data')

@@ -252,6 +252,9 @@ A part-by-part teardown of the Roborock Qrevo Curv 2 Flow robot vacuum, read fro
 - Wi-Fi antenna: Coral Pro WIFI V0.3. Role: Wi-Fi. Status: read.
 - Service port: USB-C on the main board. Role: Factory programming. Status: inferred.
 - Suction fan: (label partly legible). Role: Suction. Status: inferred.
+- Water pump: PUMP DC12V · CJVP20-AB12A. Role: Water for the mop (our reading). Status: read.
+- Key board: Beryl Lite_Key B1 · Seegem. Role: The two top buttons. Status: read.
+- LiDAR link board: BERYL LITE_LDS-B B1 · Seegem. Role: Joins the LiDAR to the main board. Status: read.
 
 ## Questions this page answers
 

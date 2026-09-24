@@ -133,11 +133,11 @@ def viewer(t):
     status = {p['id']: p['status'] for p in t['parts']}
     pins = []
     for n, (part, name, text, at, body, box) in enumerate(m['pins'], 1):
-        pin = {'n': n, 'part': part, 'name': name, 'text': text, 'status': status[part], 'at': at}
+        pin = {'n': n, 'part': part, 'name': name, 'text': text, 'status': status[part]}
+        if at:
+            pin['at'] = at
         if body:
             pin['body'] = body
-        if box:
-            pin['box'] = box
         pins.append(pin)
     cfg = {'slug': t['slug'], 'kind': m['kind'], 'play': m['play'], 'view': m['view'], 'pins': pins}
     data = json.dumps(cfg, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')

@@ -13,23 +13,24 @@ export interface Built { group: THREE.Group; callouts: Callout[]; toggles: Toggl
 // ---------- materials and textures ----------
 
 const mats = new Map<string, THREE.MeshStandardMaterial>()
-const mat = (color: string, rough = 0.55, metal = 0.1) => {
+export const mat = (color: string, rough = 0.55, metal = 0.1) => {
   const k = `${color}|${rough}|${metal}`
   if (!mats.has(k)) mats.set(k, new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal }))
   return mats.get(k)!
 }
-const GOLD = () => mat('#d8b25a', 0.3, 0.9)
-const TIN = () => mat('#c9ccd2', 0.35, 0.85)
-const COPPER = () => mat('#b8733d', 0.4, 0.8)
-const ALU = () => mat('#b7bcc4', 0.45, 0.7)
-const PKG = () => mat('#15161a', 0.6, 0.15)
+export const GOLD = () => mat('#d8b25a', 0.3, 0.9)
+export const TIN = () => mat('#c9ccd2', 0.35, 0.85)
+export const COPPER = () => mat('#b8733d', 0.4, 0.8)
+export const ALU = () => mat('#b7bcc4', 0.45, 0.7)
+export const PKG = () => mat('#15161a', 0.6, 0.15)
 
 // A small deterministic random, so passives land in the same place every load.
 let seed = 7
-const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+export const setSeed = (n: number) => { seed = n }
+export const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
 
 const PX = 22 // canvas pixels per mm
-function canvasTex(wmm: number, hmm: number, draw: (c: CanvasRenderingContext2D, w: number, h: number) => void) {
+export function canvasTex(wmm: number, hmm: number, draw: (c: CanvasRenderingContext2D, w: number, h: number) => void) {
   const s = Math.min(PX, 1536 / Math.max(wmm, hmm))
   const cv = document.createElement('canvas')
   cv.width = Math.max(8, Math.round(wmm * s)); cv.height = Math.max(8, Math.round(hmm * s))
@@ -42,7 +43,7 @@ function canvasTex(wmm: number, hmm: number, draw: (c: CanvasRenderingContext2D,
 }
 
 // Laser-etched marking on a chip top.
-function markTex(w: number, h: number, lines: string[], bg = '#17181c', fg = '#b9bcc4') {
+export function markTex(w: number, h: number, lines: string[], bg = '#17181c', fg = '#b9bcc4') {
   return canvasTex(w, h, (c, W, H) => {
     c.fillStyle = bg; c.fillRect(0, 0, W, H)
     const n = lines.length
@@ -56,7 +57,7 @@ function markTex(w: number, h: number, lines: string[], bg = '#17181c', fg = '#b
 }
 
 // A chip top with its marking ground away: matte grey, swirl marks, nothing to read.
-function groundTex(w: number, h: number) {
+export function groundTex(w: number, h: number) {
   return canvasTex(w, h, (c, W, H) => {
     c.fillStyle = '#3a3c42'; c.fillRect(0, 0, W, H)
     c.strokeStyle = 'rgba(255,255,255,.07)'
@@ -68,7 +69,7 @@ function groundTex(w: number, h: number) {
 }
 
 // Silkscreen text as a transparent decal lying on a board.
-function silk(g: THREE.Object3D, text: string, x: number, y: number, z: number, size: number, rot = 0, color = '#e9ecf2') {
+export function silk(g: THREE.Object3D, text: string, x: number, y: number, z: number, size: number, rot = 0, color = '#e9ecf2') {
   const w = text.length * size * 0.62 + size, h = size * 1.5
   const t = canvasTex(w, h, (c, W, H) => {
     c.fillStyle = color
@@ -82,7 +83,7 @@ function silk(g: THREE.Object3D, text: string, x: number, y: number, z: number, 
   return m
 }
 
-function box(g: THREE.Object3D, w: number, h: number, d: number, m: THREE.Material | THREE.Material[], x = 0, y = 0, z = 0) {
+export function box(g: THREE.Object3D, w: number, h: number, d: number, m: THREE.Material | THREE.Material[], x = 0, y = 0, z = 0) {
   const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m)
   b.position.set(x, y, z + d / 2)
   b.castShadow = b.receiveShadow = true
@@ -90,12 +91,12 @@ function box(g: THREE.Object3D, w: number, h: number, d: number, m: THREE.Materi
   return b
 }
 
-function board(g: THREE.Object3D, w: number, h: number, t: number, color: string) {
+export function board(g: THREE.Object3D, w: number, h: number, t: number, color: string) {
   box(g, w, h, t, [mat('#c9b27a', 0.7), mat('#c9b27a', 0.7), mat('#c9b27a', 0.7), mat('#c9b27a', 0.7), mat(color, 0.5, 0.1), mat(color, 0.6)])
 }
 
-interface ChipOpts { blank?: boolean; legs?: 'qfp' | 'soic' | 'none'; rot?: number; bg?: string; fg?: string; t?: number }
-function chip(g: THREE.Object3D, w: number, h: number, x: number, y: number, z: number, lines: string[], o: ChipOpts = {}) {
+export interface ChipOpts { blank?: boolean; legs?: 'qfp' | 'soic' | 'none'; rot?: number; bg?: string; fg?: string; t?: number }
+export function chip(g: THREE.Object3D, w: number, h: number, x: number, y: number, z: number, lines: string[], o: ChipOpts = {}) {
   const t = o.t ?? 1
   const holder = new THREE.Group()
   holder.position.set(x, y, z); holder.rotation.z = o.rot ?? 0
@@ -122,7 +123,7 @@ function chip(g: THREE.Object3D, w: number, h: number, x: number, y: number, z: 
   return holder
 }
 
-function passives(g: THREE.Object3D, x0: number, y0: number, x1: number, y1: number, z: number, n: number, avoid: number[][] = []) {
+export function passives(g: THREE.Object3D, x0: number, y0: number, x1: number, y1: number, z: number, n: number, avoid: number[][] = []) {
   const colors = ['#8a6f55', '#1c1d21', '#b69a74', '#2a2b30']
   let placed = 0, tries = 0
   while (placed < n && tries++ < n * 8) {
@@ -136,7 +137,7 @@ function passives(g: THREE.Object3D, x0: number, y0: number, x1: number, y1: num
   }
 }
 
-function ufl(g: THREE.Object3D, x: number, y: number, z: number) {
+export function ufl(g: THREE.Object3D, x: number, y: number, z: number) {
   const base = box(g, 2.6, 2.6, 0.6, mat('#e8e2d0', 0.6), x, y, z)
   const c = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 1.2, 20), GOLD())
   c.rotation.x = Math.PI / 2; c.position.set(x, y, z + 1.2)
@@ -144,12 +145,12 @@ function ufl(g: THREE.Object3D, x: number, y: number, z: number) {
   return base
 }
 
-function crystal(g: THREE.Object3D, x: number, y: number, z: number, text: string, w = 3.2, h = 2.5) {
+export function crystal(g: THREE.Object3D, x: number, y: number, z: number, text: string, w = 3.2, h = 2.5) {
   const top = new THREE.MeshStandardMaterial({ map: markTex(w, h, [text], '#b9bcc2', '#2a2c33'), roughness: 0.35, metalness: 0.7 })
   box(g, w, h, 0.8, [TIN(), TIN(), TIN(), TIN(), top, TIN()], x, y, z)
 }
 
-function ecap(g: THREE.Object3D, x: number, y: number, z: number, r: number, hgt: number, label: string, lying = false, sleeve = '#15161a') {
+export function ecap(g: THREE.Object3D, x: number, y: number, z: number, r: number, hgt: number, label: string, lying = false, sleeve = '#15161a') {
   const tex = canvasTex(2 * Math.PI * r, hgt, (c, W, H) => {
     c.fillStyle = sleeve; c.fillRect(0, 0, W, H)
     c.fillStyle = '#9aa0aa'; c.font = `600 ${H * 0.28}px Arial`; c.textAlign = 'center'; c.textBaseline = 'middle'
@@ -163,7 +164,7 @@ function ecap(g: THREE.Object3D, x: number, y: number, z: number, r: number, hgt
   g.add(m)
 }
 
-function jst(g: THREE.Object3D, x: number, y: number, z: number, pins: number, rot = 0, color = '#efe6cf') {
+export function jst(g: THREE.Object3D, x: number, y: number, z: number, pins: number, rot = 0, color = '#efe6cf') {
   const w = pins * 1.25 + 1.6
   const b = box(g, w, 4.2, 4.5, mat(color, 0.6), 0, 0, 0)
   const h = new THREE.Group(); h.add(b); h.position.set(x, y, z); h.rotation.z = rot
@@ -171,7 +172,7 @@ function jst(g: THREE.Object3D, x: number, y: number, z: number, pins: number, r
   return h
 }
 
-function datamatrix(g: THREE.Object3D, x: number, y: number, z: number, s: number) {
+export function datamatrix(g: THREE.Object3D, x: number, y: number, z: number, s: number) {
   const t = canvasTex(s, s, (c, W) => {
     c.fillStyle = '#e8e8e8'; c.fillRect(0, 0, W, W)
     const n = 14, q = W / n
