@@ -563,7 +563,7 @@ TEARDOWNS = [
 ]
 
 # ---------------------------------------------------------------------------
-# The cartoon 3D view on each page (src/toon.ts). `at` is in metres in the
+# The 3D view on each page (src/toon.ts). `at` is in metres in the
 # model frame (X forward, Y left, Z up), relative to `body` when given.
 # `part` is the id of the part card the pin opens; its status (shape) comes
 # from that part. `box` draws an X-ray block for the part.

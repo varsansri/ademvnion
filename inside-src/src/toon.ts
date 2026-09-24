@@ -3,15 +3,18 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
-// The cartoon 3D view on every photo-teardown page (/inside/<slug>/).
+// The 3D view on every photo-teardown page (/inside/<slug>/). (The file keeps
+// its first name, toon.ts, from a cartoon-shaded version he turned down: it is
+// now realistic, physically based materials, the same look as the Go2 page.)
 // One file for all robots: the page carries its own settings in
 // <script id="toon-data">, written by build_teardowns.py from teardowns.py.
 //   kind 'menagerie' -> Unitree's published model from /3d/<slug>.json + .glb
 //   kind 'mower' / 'vacuum' -> an approximate shape built here, sized from the
 //   teardown photos (the page says it is approximate).
-// Style rules for this site: flat cartoon shading, no outlines, one accent
-// colour; status is shown by pin shape, never by colour.
+// Style rules for this site: realistic 3D, no outlines, one accent colour for
+// the inside parts; status is shown by pin shape, never by colour.
 
 type Shape = 'h' | 'm' | 'x' | 'i' | 'n'
 interface Pin { n: number; part: string; name: string; text: string; status: Shape; at: number[]; body?: string; box?: number[] }
@@ -26,20 +29,20 @@ interface Robot {
 
 const ACCENT = '#7dd3fc'
 
-// --- cartoon shading: three flat steps of light, no gradients in between ---
-const RAMP = (() => {
-  const t = new THREE.DataTexture(new Uint8Array([88, 88, 88, 255, 165, 165, 165, 255, 255, 255, 255, 255]), 3, 1, THREE.RGBAFormat)
-  t.minFilter = t.magFilter = THREE.NearestFilter
-  t.generateMipmaps = false
-  t.needsUpdate = true
-  return t
-})()
-const toon = (color: THREE.ColorRepresentation, shell?: THREE.Material[]) => {
-  const m = new THREE.MeshToonMaterial({ color, gradientMap: RAMP })
+// --- realistic materials: each surface gets a finish, lit by a soft room ---
+type Finish = 'plastic' | 'gloss' | 'rubber' | 'metal' | 'glass'
+const FINISH: Record<Finish, { roughness: number; metalness: number }> = {
+  plastic: { roughness: 0.5, metalness: 0.1 }, gloss: { roughness: 0.26, metalness: 0.05 },
+  rubber: { roughness: 0.88, metalness: 0 }, metal: { roughness: 0.32, metalness: 0.85 },
+  glass: { roughness: 0.06, metalness: 0.3 },
+}
+const mat = (color: THREE.ColorRepresentation, finish: Finish, shell?: THREE.Material[]) => {
+  const m = new THREE.MeshStandardMaterial({ color, ...FINISH[finish] })
   shell?.push(m)
   return m
 }
-const innerMat = () => new THREE.MeshToonMaterial({ color: ACCENT, gradientMap: RAMP, emissive: ACCENT, emissiveIntensity: 0.15 })
+const INNER_GLOW = 0.3, PICKED_GLOW = 1.1
+const innerMat = () => new THREE.MeshStandardMaterial({ color: ACCENT, emissive: ACCENT, emissiveIntensity: INNER_GLOW, roughness: 0.4, metalness: 0.1 })
 
 async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
   const robot = cfg.kind === 'menagerie' ? await menagerie(cfg) : cfg.kind === 'mower' ? mower(cfg) : vacuum(cfg)
@@ -50,13 +53,20 @@ async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
   renderer.setPixelRatio(Math.min(devicePixelRatio, small ? 1.5 : 2))
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  renderer.toneMapping = THREE.ACESFilmicToneMapping
+  renderer.toneMappingExposure = 1.05
   stage.prepend(renderer.domElement)
 
   const scene = new THREE.Scene()
+  // A soft studio room for reflections, so plastic, rubber and metal read as themselves.
+  const pmrem = new THREE.PMREMGenerator(renderer)
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+  scene.environmentIntensity = 0.55
+  pmrem.dispose()
   scene.add(robot.group)
   robot.group.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh && !m.userData.noShadow) m.castShadow = true })
-  scene.add(new THREE.HemisphereLight('#ffffff', '#2a2f3a', 1.35))
-  const sun = new THREE.DirectionalLight('#ffffff', 2.2)
+  scene.add(new THREE.HemisphereLight('#dfe7ff', '#0b0d12', 0.9))
+  const sun = new THREE.DirectionalLight('#ffffff', 2.4)
   scene.add(sun, sun.target)
 
   // Frame the robot from its own size, looking from cfg.view.
@@ -135,7 +145,7 @@ async function main(root: HTMLElement, stage: HTMLElement, cfg: Cfg) {
     const p = cfg.pins.find(x => x.n === selected)
     pinFor.forEach((b, k) => b.classList.toggle('on', k === selected))
     list.querySelectorAll('button').forEach(b => b.classList.toggle('on', Number(b.dataset.n) === selected))
-    boxFor.forEach((m, part) => { (m.material as THREE.MeshToonMaterial).emissiveIntensity = p && p.part === part ? 0.9 : 0.15 })
+    boxFor.forEach((m, part) => { (m.material as THREE.MeshStandardMaterial).emissiveIntensity = p && p.part === part ? PICKED_GLOW : INNER_GLOW })
     if (p && p.box && !xray) setXray(true)
     focus(p ?? null)
     info.innerHTML = p
@@ -292,11 +302,11 @@ async function menagerie(cfg: Cfg): Promise<Robot> {
   const first = data.bodies[0]
   pivots.get(first.name)!.parent!.position.z = data.home_height
 
-  // Cartoon palette from the model's own two materials: dark parts and light parts.
+  // Two finishes from the model's own two materials: dark parts and light parts.
   const shell: THREE.Material[] = []
-  // A robot drawn only in dark parts (the Go1) gets a lighter grey, or it vanishes on the dark page.
+  // A robot drawn only in dark parts (the Go1) gets a mid grey, or it vanishes on the dark page.
   const allDark = data.geoms.every(g => g.color[0] + g.color[1] + g.color[2] < 1)
-  const DARK = toon(allDark ? '#6a7281' : '#3b404b', shell), LIGHT = toon('#dfe3ea', shell)
+  const DARK = mat(allDark ? '#5b616c' : '#1b1e25', 'plastic', shell), LIGHT = mat('#d9dde3', 'plastic', shell)
   for (const g of data.geoms) {
     const geo = geos.get(g.mesh)
     if (!geo) continue
@@ -354,8 +364,9 @@ async function menagerie(cfg: Cfg): Promise<Robot> {
 // X forward. Body about 0.70 x 0.50 m; boards and battery sized from the photos.
 function mower(cfg: Cfg): Robot {
   const group = new THREE.Group(), shell: THREE.Material[] = [], inner: THREE.Object3D[] = []
-  const BODY = toon('#3a3f48', shell), TOP = toon('#555b66', shell), BLACK = toon('#22252b', shell)
-  const TYRE = toon('#f2762e', shell), HUB = toon('#2a2e35', shell), GLASS = toon('#9fb3c8', shell)
+  const BODY = mat('#2f333a', 'plastic', shell), TOP = mat('#474d57', 'gloss', shell), BLACK = mat('#1c1f24', 'gloss', shell)
+  const TYRE = mat('#e5692a', 'rubber', shell), HUB = mat('#2a2e35', 'metal', shell), GLASS = mat('#0e1216', 'glass', shell)
+  const STEEL = mat('#c9ced6', 'metal', shell)
 
   const chassis = new THREE.Mesh(new RoundedBoxGeometry(0.6, 0.42, 0.14, 4, 0.05), BODY)
   chassis.position.set(0.02, 0, 0.13)
@@ -410,7 +421,7 @@ function mower(cfg: Cfg): Robot {
   disc.rotation.x = Math.PI / 2                     // cylinder axis Y -> Z (flat disc)
   blade.add(disc)
   for (let i = 0; i < 3; i++) {
-    const b = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.018, 0.004), GLASS)
+    const b = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.018, 0.004), STEEL)
     const a = (i / 3) * Math.PI * 2
     b.position.set(Math.cos(a) * 0.12, Math.sin(a) * 0.12, 0)
     b.rotation.z = a
@@ -457,16 +468,16 @@ function mower(cfg: Cfg): Robot {
 // across, LiDAR turret on top, roller mop at the back.
 function vacuum(cfg: Cfg): Robot {
   const group = new THREE.Group(), shell: THREE.Material[] = [], inner: THREE.Object3D[] = []
-  const WHITE = toon('#e8ebf0', shell), GREY = toon('#9aa1ad', shell), DARK = toon('#2a2e35', shell), MOP = toon('#c9ced6', shell)
+  const WHITE = mat('#eef0f3', 'gloss', shell), GREY = mat('#8d939c', 'plastic', shell), DARK = mat('#1d2026', 'gloss', shell), MOP = mat('#d3d7dd', 'rubber', shell)
 
-  // Body: a lathe profile gives the soft rounded rim a cartoon reads well.
+  // Body: a lathe profile gives the soft rounded rim.
   const prof = [[0, 0.012], [0.165, 0.012], [0.175, 0.03], [0.176, 0.07], [0.168, 0.088], [0.14, 0.095], [0, 0.095]]
     .map(([r, z]) => new THREE.Vector2(r, z))
   const body = new THREE.Mesh(new THREE.LatheGeometry(prof, 64), WHITE)
   body.rotation.x = Math.PI / 2
   group.add(body)
   // Front bumper band: an open arc centred on +X (theta = PI/2 is local +X).
-  const BUMP = toon('#9aa1ad', shell)
+  const BUMP = mat('#8d939c', 'plastic', shell)
   BUMP.side = THREE.DoubleSide
   const bumper = new THREE.Mesh(new THREE.CylinderGeometry(0.178, 0.178, 0.045, 64, 1, true, Math.PI * 0.08, Math.PI * 0.84), BUMP)
   bumper.rotation.x = Math.PI / 2
@@ -536,7 +547,7 @@ function vacuum(cfg: Cfg): Robot {
 }
 
 // Start last: the mower and vacuum are built synchronously, so every constant
-// above (RAMP, toon, innerMat) must exist before main() runs.
+// above (FINISH, mat, innerMat) must exist before main() runs.
 const rootEl = document.getElementById('toon-3d')
 const stageEl = document.getElementById('toonstage')
 const dataEl = document.getElementById('toon-data')

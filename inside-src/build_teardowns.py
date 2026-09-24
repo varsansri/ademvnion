@@ -126,7 +126,7 @@ def head(t):
 
 
 def viewer(t):
-    """The cartoon 3D view (src/toon.ts, built to /3d/toon.js) and its settings."""
+    """The 3D view (src/toon.ts, built to /3d/toon.js) and its settings."""
     m = MODELS.get(t['slug'])
     if not m:
         return ''
