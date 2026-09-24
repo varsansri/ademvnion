@@ -101,3 +101,17 @@ footer{border-top:1px solid var(--line);padding:24px var(--gutter);color:var(--d
 .qa details[open] summary::before{content:"\2013"}
 .qa details p{margin:10px 0 0 20px;color:var(--muted);max-width:68ch}
 .qanote{margin-top:20px;font-size:13px;color:var(--muted)}
+/* One sheet: no borders or divider lines except on buttons.
+   Panels are a faint lift in tone; lists are held by space. */
+.top{border-bottom:0}
+.stage{border:0}
+.side,article.part,.cta,.card,.ctl{border:0;background:rgba(255,255,255,.028)}
+.card:hover{background:rgba(255,255,255,.05)}
+article.part.active{background:rgba(125,211,252,.07)}
+.ctl{background:rgba(255,255,255,.035)}
+.row .sw{border:0}
+.spec li{border-top:0;padding-top:2px}
+.inside li{border-left:0;padding-left:0}
+details,.qa details{border-top:0;border-bottom:0}
+.qa{border-top:0}
+footer{border-top:0}

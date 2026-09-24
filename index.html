@@ -154,6 +154,24 @@
   .qanote{margin-top:22px;font-size:13px;color:var(--muted)}
   .qanote a{color:var(--fg);border-bottom:1px solid var(--line)}
 
+  /* One sheet: no borders or divider lines anywhere except buttons.
+     Grouping comes from space and a faint lift in tone, never an edge. */
+  header{border-bottom:0}
+  section,footer,.qa{border-top:0}
+  .eyebrow{border:0;background:rgba(255,255,255,.045)}
+  .armcap a,.qanote a{border-bottom:0;color:var(--accent)}
+  .armcap a:hover,.qanote a:hover{color:var(--fg)}
+  .card{border:0;background:rgba(255,255,255,.028)}
+  .card:hover{background:rgba(255,255,255,.05)}
+  .card .ic{border:0;background:rgba(125,211,252,.08)}
+  .compare .col{border:0;background:rgba(255,255,255,.028)}
+  .compare .col.win{background:linear-gradient(180deg,rgba(125,211,252,.09),rgba(125,211,252,.02))}
+  .compare li,.compare li:first-child{border-top:0;padding:7px 0}
+  .step,.step:last-child{border-top:0;border-bottom:0;padding:18px 0}
+  .step.now h3::after{border:0;background:rgba(125,211,252,.12)}
+  .qa details{border-bottom:0;padding:14px 18px;border-radius:14px;margin:0 -18px;transition:background .2s}
+  .qa details:hover,.qa details[open]{background:rgba(255,255,255,.03)}
+
   @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Adem","alternateName":"Ademvnion","url":"https://ademvnion.com/","logo":"https://ademvnion.com/img/logo.png","image":"https://ademvnion.com/img/og.jpg","description":"Adem builds Vnion, wearable human enhancement, and ships free browser software for designing robots and taking real ones apart."}</script>
