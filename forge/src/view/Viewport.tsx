@@ -72,10 +72,6 @@ export default function Viewport() {
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshStandardMaterial({ color: '#141720', roughness: 0.95, metalness: 0 }))
     floor.receiveShadow = true
     sc.add(floor)
-    const grid = new THREE.GridHelper(40, 80, '#2a3040', '#1b1f28')
-    grid.rotation.x = Math.PI / 2
-    grid.position.z = 0.001
-    sc.add(grid)
 
     // Lift-task target: a ring at the goal height above the payload.
     const ring = new THREE.Mesh(new THREE.RingGeometry(0.12, 0.135, 48), new THREE.MeshBasicMaterial({ color: '#fbbf24', transparent: true, opacity: 0.8, side: THREE.DoubleSide }))

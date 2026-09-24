@@ -58,10 +58,6 @@ async function main(stage: HTMLElement, side: HTMLElement) {
   floor.position.z = -0.0245
   floor.receiveShadow = true
   scene.add(floor)
-  const grid = new THREE.GridHelper(2.4, 48, '#262c38', '#1b1f28')
-  grid.rotation.x = Math.PI / 2
-  grid.position.z = -0.024
-  scene.add(grid)
 
   // --- kinematic tree ---
   const linkGroups = new Map<string, THREE.Group>()          // link frame

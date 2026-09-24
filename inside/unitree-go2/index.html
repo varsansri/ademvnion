@@ -169,6 +169,8 @@ td .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:v
 th,td{border-bottom:0}
 th{background:rgba(255,255,255,.035)}
 tbody tr:nth-child(even) td{background:rgba(255,255,255,.018)}
+.stage3d::before{display:none}
+.fine a,.crumbs a,p a{text-decoration:none;color:var(--accent)}
 </style>
 </head>
 <body>
@@ -238,14 +240,13 @@ tbody tr:nth-child(even) td{background:rgba(255,255,255,.018)}
   <figure class="map">
     <div class="scroll"><svg viewBox="0 0 880 430" role="img" aria-label="Diagram of the Go2 main board: core board in the centre, radios on the left, four leg buses and the battery on the right">
       <defs><style>
-        .bx{fill:#12151c;stroke:#262c38;stroke-width:1.2}
-        .core{fill:#0f1a24;stroke:#7dd3fc;stroke-width:1.5}
+        .bx{fill:#151922}
+        .core{fill:#11202c}
         .t{fill:#f4f5f7;font:600 13px system-ui,sans-serif}
         .s{fill:#9aa3b2;font:12px system-ui,sans-serif}
         .k{fill:#5b6373;font:500 10.5px system-ui,sans-serif;letter-spacing:.08em}
-        .ln{stroke:#3a4252;stroke-width:1.4;fill:none}
-        .lg{stroke:#c084fc;stroke-width:1.6;fill:none}
-        .hid{fill:#1a0f10;stroke:#7a2e2e;stroke-width:1.2}
+        .ln,.lg{display:none}
+        .hid{fill:#231316}
       </style></defs>
       <rect x="300" y="120" width="280" height="190" rx="12" class="core"/>
       <text x="440" y="150" text-anchor="middle" class="k">PLUG-IN CORE BOARD</text>

@@ -115,3 +115,5 @@ article.part.active{background:rgba(125,211,252,.07)}
 details,.qa details{border-top:0;border-bottom:0}
 .qa{border-top:0}
 footer{border-top:0}
+a{text-decoration:none}
+main a:not(.card):not(.mini),footer a{color:var(--accent)}

@@ -169,7 +169,6 @@ async function main(root: HTMLElement, stage: HTMLElement) {
     brain: [coreBoard, 0.9, [0, 0, 0]], '4g': [lteCard, 0.9, [0, 0, 0]], wifi: [wifiModule, 1, [0, 0, 0]],
     radio: [radioBoard, 1, [0, 0, 0]], uwb: [uwbBoard, 0.7, [0, 0, 0]], fans: [blowerFan, 0.8, [Math.PI / 2, 0, 0]],
   }
-  const outlines = new Map<string, THREE.LineBasicMaterial>()
   for (const p of PARTS) {
     const def = MODELS[p.id]
     if (!def) continue
@@ -180,12 +179,6 @@ async function main(root: HTMLElement, stage: HTMLElement) {
     const bb = new THREE.Box3().setFromObject(g)
     g.position.fromArray(p.at).sub(bb.getCenter(new THREE.Vector3()))
     inner.add(g)
-    const size = bb.getSize(new THREE.Vector3()).addScalar(0.004)
-    const lm = new THREE.LineBasicMaterial({ color: STATUS_COLOR[p.status], transparent: true, opacity: 0.45, depthTest: false })
-    const line = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(size.x, size.y, size.z)), lm)
-    line.position.fromArray(p.at); line.renderOrder = 11
-    inner.add(line)
-    outlines.set(p.id, lm)
   }
   const lidar = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.03, 24), glow(STATUS_COLOR.Inferred))
   lidar.position.fromArray(PARTS.find(p => p.id === 'lidar')!.at)
@@ -270,7 +263,6 @@ async function main(root: HTMLElement, stage: HTMLElement) {
     pinFor.forEach((b, k) => b.classList.toggle('on', k === selected))
     list.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.id === selected))
     blocks.forEach((m, k) => ((m.material as THREE.MeshStandardMaterial).emissiveIntensity = k === selected ? 2.2 : 0.9))
-    outlines.forEach((m, k) => (m.opacity = k === selected ? 1 : 0.45))
     ringMat.emissiveIntensity = selected === 'motors' ? 2.2 : 0.9
     if (p && !xray) setXray(true)
     focus(p ?? null)
