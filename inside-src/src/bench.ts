@@ -5,7 +5,8 @@ import { PART_DEFS, type Built } from './parts'
 // The parts bench: each part of the Go2 rebuilt in 3D on its own turntable,
 // with numbered labels on every chip that could be named.
 
-const STATUS_COLOR: Record<string, string> = { Read: '#4ade80', Matched: '#fbbf24', Hidden: '#f87171', Inferred: '#c084fc' }
+// One colour; shape tells the status apart.
+const STATUS_SHAPE: Record<string, string> = { Read: 'h', Matched: 'm', Hidden: 'x', Inferred: 'i' }
 const STATUS_LABEL: Record<string, string> = { Read: 'Read', Matched: 'Matched', Hidden: 'Ground blank', Inferred: 'Inferred' }
 
 export function startBench() {
@@ -65,7 +66,7 @@ export function startBench() {
     const b = document.createElement('button')
     b.type = 'button'
     b.dataset.id = d.id
-    b.innerHTML = `<i style="--c:${STATUS_COLOR[d.status]}"></i>${d.name}`
+    b.innerHTML = `<i class="s-${STATUS_SHAPE[d.status]}"></i>${d.name}`
     b.addEventListener('click', () => show(d.id))
     tabs.appendChild(b)
   }
@@ -112,7 +113,7 @@ export function startBench() {
       const b = document.createElement('button')
       b.type = 'button'; b.className = 'pin stem'; b.textContent = String(i + 1)
       b.style.visibility = 'hidden'
-      b.style.setProperty('--c', '#7dd3fc')
+      b.style.setProperty('--c', '#e9edf3')
       b.setAttribute('aria-label', `${i + 1}. ${c.name}`)
       b.addEventListener('click', () => pick(i))
       pinsEl.appendChild(b)
@@ -122,7 +123,7 @@ export function startBench() {
     const toggles = cur.toggles.map((t, i) => `<label class="tg"><input type="checkbox" data-t="${i}" ${t.on ? 'checked' : ''}> ${t.label}</label>`).join('')
     const explode = cur.explode ? `<label class="ex">Pull it apart <input type="range" min="0" max="1" step="0.01" value="0.55" data-ex></label>` : ''
     side.innerHTML = `
-      <p class="k"><span class="chip" style="--c:${STATUS_COLOR[def.status]}">${STATUS_LABEL[def.status]}</span> ${def.name}</p>
+      <p class="k"><span class="chip"><i class="st ${STATUS_SHAPE[def.status]}"></i>${STATUS_LABEL[def.status]}</span> ${def.name}</p>
       <p class="blurb">${def.blurb}</p>
       ${toggles}${explode}
       <ol class="clist">${cur.callouts.map((c, i) => `<li><button type="button" data-i="${i}"><i>${i + 1}</i><span><b>${c.name}</b><small>${c.text}</small></span></button></li>`).join('')}</ol>`

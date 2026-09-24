@@ -130,3 +130,12 @@ h1{font-size:clamp(28px,4.4vw,46px);line-height:1.08}
 .card h3{font-size:18px}
 .side h4,.side h5{letter-spacing:.06em}
 .totals b,.mini,.qa summary,.cta b{font-family:"Space Mono",ui-monospace,Menlo,Consolas,monospace}
+
+/* One colour, shapes not colours: category marks in the parts list. */
+.row .sw{background:#e9edf3;border-radius:50%;width:9px;height:9px}
+.row .sw.sw-electronics{border-radius:2px}
+.row .sw.sw-structure{border-radius:1px;transform:rotate(45deg) scale(.82)}
+.row .sw.sw-fastener{background:linear-gradient(90deg,#e9edf3 50%,rgba(233,237,243,.22) 50%)}
+.row .sw.sw-tool{opacity:.35}
+.side .rm{color:var(--muted)}
+.ctl input[type=range]{accent-color:var(--accent)}

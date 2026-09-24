@@ -48,7 +48,9 @@ const PARTS: Part[] = [
     text: 'Three per leg: hip side-swing, hip, knee. Each outrunner motor has its own driver board (M12_MDRV_V1.9.1) inside the joint. In X-ray they glow at the joints.',
     at: [0, 0, 0] },
 ]
-const STATUS_COLOR: Record<Status, string> = { Read: '#4ade80', Matched: '#fbbf24', Hidden: '#f87171', Inferred: '#c084fc' }
+// One colour for every status; shape tells them apart (pins, list, chips).
+const STATUS_COLOR: Record<Status, string> = { Read: '#7dd3fc', Matched: '#7dd3fc', Hidden: '#7dd3fc', Inferred: '#7dd3fc' }
+const STATUS_SHAPE: Record<Status, string> = { Read: 'h', Matched: 'm', Hidden: 'x', Inferred: 'i' }
 
 const root = document.getElementById('go2-3d')
 const stage = document.getElementById('go2stage')
@@ -160,7 +162,7 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   // Drawn through the faded shell: no depth test, drawn after it.
   const glow = (color: string, o = 0.9) => new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.9, transparent: true, opacity: o, depthWrite: false, depthTest: false })
   // The main board everything plugs into ("712 MAIN BOARD-RK").
-  const mainBoard = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.075, 0.003), glow('#2dd4bf', 0.35))
+  const mainBoard = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.075, 0.003), glow('#7dd3fc', 0.22))
   mainBoard.position.set(0, 0, 0.022)
   inner.add(mainBoard)
   // The rebuilt parts themselves (millimetre models from parts.ts), each in a
@@ -234,10 +236,10 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   const pinFor = new Map<string, HTMLButtonElement>()
   for (const p of PARTS) {
     const b = document.createElement('button')
-    b.className = 'pin'
+    b.className = 'pin s-' + STATUS_SHAPE[p.status]
     b.type = 'button'
     b.textContent = String(p.n)
-    b.style.setProperty('--c', STATUS_COLOR[p.status])
+    b.style.setProperty('--c', '#e9edf3')
     b.setAttribute('aria-label', `${p.n}. ${p.name}`)
     b.addEventListener('click', () => select(p.id))
     pinsEl.appendChild(b)
@@ -246,7 +248,7 @@ async function main(root: HTMLElement, stage: HTMLElement) {
   const list = root.querySelector('.plist') as HTMLElement
   for (const p of PARTS) {
     const li = document.createElement('li')
-    li.innerHTML = `<button type="button" data-id="${p.id}"><i style="--c:${STATUS_COLOR[p.status]}">${p.n}</i>${p.name}</button>`
+    li.innerHTML = `<button type="button" data-id="${p.id}"><i class="s-${STATUS_SHAPE[p.status]}" style="--c:#e9edf3">${p.n}</i>${p.name}</button>`
     li.querySelector('button')!.addEventListener('click', () => select(p.id))
     list.appendChild(li)
   }
@@ -267,7 +269,7 @@ async function main(root: HTMLElement, stage: HTMLElement) {
     if (p && !xray) setXray(true)
     focus(p ?? null)
     info.innerHTML = p
-      ? `<p class="k"><span class="chip" style="--c:${STATUS_COLOR[p.status]}">${p.status === 'Hidden' ? 'Ground blank' : p.status}</span> Part ${p.n}</p><h3>${p.name}</h3><p>${p.text}</p><p><a href="#${p.card}">Full details ↓</a></p>`
+      ? `<p class="k"><span class="chip"><i class="st ${STATUS_SHAPE[p.status]}"></i>${p.status === 'Hidden' ? 'Ground blank' : p.status}</span> Part ${p.n}</p><h3>${p.name}</h3><p>${p.text}</p><p><a href="#${p.card}">Full details ↓</a></p>`
       : `<p class="k">Tap a number</p><p>Each number is a part found in the teardown. X-ray fades the shell to show the rebuilt parts inside.</p>`
     invalidate()
   }

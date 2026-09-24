@@ -178,3 +178,34 @@ h2{font-size:clamp(21px,2.4vw,28px)}
 .more b{display:block;color:var(--fg);font-family:"Space Mono",ui-monospace,monospace;margin-top:4px}
 .more small{display:block;color:var(--muted);font-size:12.5px;margin-top:4px}
 .callout.plain{grid-template-columns:1fr}
+
+/* ---- One colour, shapes not colours ----
+   Status is carried by shape: Read = solid circle, Matched = half circle,
+   Ground blank = solid square, Inferred = diamond, Not visible = faint circle. */
+:root{--read:#e9edf3;--matched:#e9edf3;--hidden:#e9edf3;--inferred:#e9edf3;--unseen:#e9edf3}
+h1 span{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--accent);-webkit-text-fill-color:currentColor}
+i.st{display:inline-block;flex:none;width:9px;height:9px;margin-right:7px;vertical-align:0;background:#e9edf3;border-radius:50%;box-shadow:none}
+i.st.m{background:linear-gradient(90deg,#e9edf3 50%,rgba(233,237,243,.22) 50%)}
+i.st.x{border-radius:2px}
+i.st.i{border-radius:1px;transform:rotate(45deg) scale(.82)}
+i.st.n{opacity:.3}
+.legend i.st{box-shadow:none}
+.conf,.conf.h,.conf.m,.conf.x,.conf.i,.conf.n{color:var(--muted);background:rgba(255,255,255,.06)}
+.conf i.st{width:7px;height:7px;margin-right:6px}
+.chip{color:var(--fg);background:rgba(255,255,255,.07)}
+.chip i.st{width:7px;height:7px;margin-right:6px}
+.callout{background:rgba(255,255,255,.028);grid-template-columns:1fr}
+.callout p{color:var(--muted)}
+.callout .ico{display:none}
+.pin.s-m{background:linear-gradient(90deg,rgba(233,237,243,.3) 50%,#07080bd9 50%)}
+.pin.s-x{border-radius:6px}
+.pin.s-i{border-radius:50% 5px 50% 5px}
+.pin.s-n{opacity:.6}
+.pin.on,.pin:hover{background:var(--fg);color:#07080b}
+.plist i.s-x,.clist i.s-x{border-radius:5px}
+.plist i.s-i,.clist i.s-i{border-radius:50% 4px 50% 4px}
+.plist i.s-m,.clist i.s-m{background:linear-gradient(90deg,rgba(233,237,243,.34) 50%,rgba(233,237,243,.08) 50%)}
+.btabs button i{box-shadow:none;background:#e9edf3}
+.btabs button i.s-x{border-radius:2px}
+.btabs button i.s-i{border-radius:1px;transform:rotate(45deg) scale(.85)}
+.btabs button i.s-m{background:linear-gradient(90deg,#e9edf3 50%,rgba(233,237,243,.22) 50%)}

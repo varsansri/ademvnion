@@ -187,12 +187,11 @@ async function main(stage: HTMLElement, side: HTMLElement) {
       ${cats.map(c => {
         const ps = data.parts.filter(p => p.category === c)
         if (!ps.length) return ''
-        return `<h4>${CAT_LABEL[c]}</h4>` + ps.map(p => `<div class="row ${state.hidden.has(p.id) ? 'hid' : ''}" data-part="${p.id}"><span class="sw" style="background:${swatch(p)}"></span><span class="nm">${p.name}</span><span class="q">×${p.qty}</span>${p.shown ? `<button class="eye" data-hide="${p.id}" title="${state.hidden.has(p.id) ? 'Show' : 'Hide'}">${state.hidden.has(p.id) ? '◌' : '●'}</button>` : '<span class="q">not in CAD</span>'}</div>`).join('')
+        return `<h4>${CAT_LABEL[c]}</h4>` + ps.map(p => `<div class="row ${state.hidden.has(p.id) ? 'hid' : ''}" data-part="${p.id}"><span class="sw sw-${p.category}"></span><span class="nm">${p.name}</span><span class="q">×${p.qty}</span>${p.shown ? `<button class="eye" data-hide="${p.id}" title="${state.hidden.has(p.id) ? 'Show' : 'Hide'}">${state.hidden.has(p.id) ? '◌' : '●'}</button>` : '<span class="q">not in CAD</span>'}</div>`).join('')
       }).join('')}
       <p class="hint">Click a part in 3D or in this list. ● hides it — watch what it was holding up.</p>`
     wireCommon()
   }
-  const swatch = (p: Part) => p.category === 'actuator' ? '#2b2f3a' : p.category === 'electronics' ? '#1f7a4d' : p.category === 'structure' ? '#8b93a7' : '#5b6373'
 
   const partView = (p: Part) => {
     const hidden = state.hidden.has(p.id)
@@ -283,7 +282,7 @@ async function main(stage: HTMLElement, side: HTMLElement) {
   const resize = () => { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix() }
   new ResizeObserver(() => { resize(); invalidate() }).observe(stage)
   resize()
-  const SELC = new THREE.Color('#7dd3fc'), HOVC = new THREE.Color('#c084fc')
+  const SELC = new THREE.Color('#7dd3fc'), HOVC = new THREE.Color('#e9edf3')
   // Render on demand: nothing is drawn while the page sits still.
   controls.addEventListener('change', invalidate)
   renderer.domElement.addEventListener('pointermove', invalidate)

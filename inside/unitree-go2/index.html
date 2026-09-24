@@ -189,6 +189,37 @@ h2{font-size:clamp(21px,2.4vw,28px)}
 .stat b{font-weight:700;letter-spacing:-.03em}
 .short span{letter-spacing:.06em}
 .short b{font-weight:700;font-size:15px}
+
+/* ---- One colour, shapes not colours ----
+   Status is carried by shape: Read = solid circle, Matched = half circle,
+   Ground blank = solid square, Inferred = diamond, Not visible = faint circle. */
+:root{--read:#e9edf3;--matched:#e9edf3;--hidden:#e9edf3;--inferred:#e9edf3;--unseen:#e9edf3}
+h1 span{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--accent);-webkit-text-fill-color:currentColor}
+i.st{display:inline-block;flex:none;width:9px;height:9px;margin-right:7px;vertical-align:0;background:#e9edf3;border-radius:50%;box-shadow:none}
+i.st.m{background:linear-gradient(90deg,#e9edf3 50%,rgba(233,237,243,.22) 50%)}
+i.st.x{border-radius:2px}
+i.st.i{border-radius:1px;transform:rotate(45deg) scale(.82)}
+i.st.n{opacity:.3}
+.legend i.st{box-shadow:none}
+.conf,.conf.h,.conf.m,.conf.x,.conf.i,.conf.n{color:var(--muted);background:rgba(255,255,255,.06)}
+.conf i.st{width:7px;height:7px;margin-right:6px}
+.chip{color:var(--fg);background:rgba(255,255,255,.07)}
+.chip i.st{width:7px;height:7px;margin-right:6px}
+.callout{background:rgba(255,255,255,.028);grid-template-columns:1fr}
+.callout p{color:var(--muted)}
+.callout .ico{display:none}
+.pin.s-m{background:linear-gradient(90deg,rgba(233,237,243,.3) 50%,#07080bd9 50%)}
+.pin.s-x{border-radius:6px}
+.pin.s-i{border-radius:50% 5px 50% 5px}
+.pin.s-n{opacity:.6}
+.pin.on,.pin:hover{background:var(--fg);color:#07080b}
+.plist i.s-x,.clist i.s-x{border-radius:5px}
+.plist i.s-i,.clist i.s-i{border-radius:50% 4px 50% 4px}
+.plist i.s-m,.clist i.s-m{background:linear-gradient(90deg,rgba(233,237,243,.34) 50%,rgba(233,237,243,.08) 50%)}
+.btabs button i{box-shadow:none;background:#e9edf3}
+.btabs button i.s-x{border-radius:2px}
+.btabs button i.s-i{border-radius:1px;transform:rotate(45deg) scale(.85)}
+.btabs button i.s-m{background:linear-gradient(90deg,#e9edf3 50%,rgba(233,237,243,.22) 50%)}
 </style>
 </head>
 <body>
@@ -211,7 +242,7 @@ h2{font-size:clamp(21px,2.4vw,28px)}
         <div class="stat"><b>4G · Wi-Fi 6</b><span>plus UWB and a long-range remote link</span></div>
         <div class="stat"><b>4</b><span>boards with their chip markings ground off</span></div>
       </div>
-      <div class="legend"><span><i style="--c:var(--read)"></i>Read</span><span><i style="--c:var(--matched)"></i>Matched</span><span><i style="--c:var(--hidden)"></i>Ground blank</span><span><i style="--c:var(--inferred)"></i>Inferred</span></div>
+      <div class="legend"><span><i class="st h"></i>Read</span><span><i class="st m"></i>Matched</span><span><i class="st x"></i>Ground blank</span><span><i class="st i"></i>Inferred</span></div>
     </div>
   </section>
 
@@ -298,46 +329,46 @@ h2{font-size:clamp(21px,2.4vw,28px)}
   <p class="sub"><b>Read</b>: the name is printed on the part and legible. <b>Matched</b>: not legible on the Go2, identified another way. <b>Ground blank</b>: Unitree removed the marking. <b>Inferred</b>: our best reading, explained.</p>
   <div class="parts">
   <article class="part" id="p-brain">
-    <h3>The brain: Rockchip RK3588S core board <span class="conf m">Matched</span></h3>
+    <h3>The brain: Rockchip RK3588S core board <span class="conf m"><i class="st m"></i>Matched</span></h3>
     <p>A plug-in computer board, <b>XF_RK_Core_Board_V10</b>, sits on the main board under an aluminium heatsink with copper heat pipes and a blower fan. It holds the processor, its memory, its storage and a power chip. On the Go2 every chip top is ground blank, but the board is silkscreened <b>“8+64G”</b>: 8 GB of memory, 64 GB of storage.</p>
     <p><b>How we know it is an RK3588S:</b> the identical board, same name, layout and “8+64G” label, turns up in Unitree's 2025 humanoid with its markings intact: <b>Rockchip RK3588S</b>, two <b>Biwin BWMZCX32H2A-32G-X</b> memory chips, <b>Biwin BWCTAKJ11X64G</b> storage and a Rockchip power chip. The Go2 and the humanoid share one brain.</p>
     <ul><li>RK3588S: 4× Cortex-A76 + 4× Cortex-A55, 6 TOPS neural accelerator, built for cameras and on-device AI.</li></ul>
     <button class="see" type="button" data-part="brain">See it in 3D ↑</button>
   </article>
   <article class="part" id="p-4g">
-    <h3>4G: Quectel EG25-G <span class="conf h">Read</span></h3>
+    <h3>4G: Quectel EG25-G <span class="conf h"><i class="st h"></i>Read</span></h3>
     <p>A standard 4G card pushed into a <b>mini PCIe</b> socket on the main board. Under its shield: a <b>Qualcomm MDM9207</b> modem, <b>Nanya NM1282KSLAXAL-3B</b> memory, a <b>Qualcomm WTR2965</b> transceiver and two <b>Qorvo</b> power amplifiers (77031, 77033).</p>
     <p><b>Why it is there.</b> It lets the dog be reached from the phone app away from home Wi-Fi.</p>
     <button class="see" type="button" data-part="4g">See it in 3D ↑</button>
   </article>
   <article class="part" id="p-wifi">
-    <h3>Wi-Fi 6 and Bluetooth: Realtek RTL8852BU <span class="conf h">Read</span></h3>
+    <h3>Wi-Fi 6 and Bluetooth: Realtek RTL8852BU <span class="conf h"><i class="st h"></i>Read</span></h3>
     <p>A module labelled <b>BL-M8852BU1</b> (an LB-Link part) carries the <b>Realtek RTL8852BU</b>: dual-band Wi-Fi 6 plus Bluetooth over USB. Two antenna cables, “chain 0” and “chain 1”, go to <b>Rainsun</b> antennas. The phone app and controller connect here.</p>
     <button class="see" type="button" data-part="wifi">See it in 3D ↑</button>
   </article>
   <article class="part" id="p-radio">
-    <h3>Remote-control radio “YS.PPRF” <span class="conf x">Ground blank</span></h3>
+    <h3>Remote-control radio “YS.PPRF” <span class="conf x"><i class="st x"></i>Ground blank</span></h3>
     <p>A separate radio board, silkscreened <b>YS.PPRF 23</b>, with a <b>2401C</b> 2.4 GHz front-end amplifier and two crystals. Its two main chips have had their markings ground off. A separate <b>LoRa</b> antenna is fitted too, so the dog has a slow, long-range link as well as Wi-Fi.</p>
     <button class="see" type="button" data-part="radio">See it in 3D ↑</button>
   </article>
   <article class="part" id="p-uwb">
-    <h3>UWB positioning board <span class="conf x">Ground blank</span></h3>
+    <h3>UWB positioning board <span class="conf x"><i class="st x"></i>Ground blank</span></h3>
     <p>A clover-shaped gold board with <b>four UWB antennas</b>: the hardware behind “follow me”. Ultra-wideband pulses measure the exact distance and angle to the handheld remote. The ranging chip, its controller and the amplifiers beside them all had their markings ground off.</p>
     <button class="see" type="button" data-part="uwb">See it in 3D ↑</button>
   </article>
   <article class="part" id="p-motors">
-    <h3>Twelve leg motors, each with its own driver <span class="conf h">Read</span></h3>
+    <h3>Twelve leg motors, each with its own driver <span class="conf h"><i class="st h"></i>Read</span></h3>
     <p>Three joints per leg (hip side-swing, hip, knee), each a flat <b>outrunner brushless motor</b> in a finned aluminium housing. A round driver board, silkscreened <b>“M12_MDRV_V1.9.1 · 2023/5/10 · Unitree”</b>, sits inside the joint with its power transistors and capacitors; a small star-shaped board, most likely the position sensor, sits at the centre. The main board only sends commands down one bus per leg; the high current never leaves the joint.</p>
     <ul><li>The centre chip on the driver board has had its marking removed.</li></ul>
     <button class="see" type="button" data-part="motors">See it in 3D ↑</button>
   </article>
   <article class="part" id="p-lidar">
-    <h3>A small motor board, “LD BOT V0.2.6” <span class="conf i">Inferred</span></h3>
+    <h3>A small motor board, “LD BOT V0.2.6” <span class="conf i"><i class="st i"></i>Inferred</span></h3>
     <p>A compact brushless motor, about 5 cm across, paired with a board marked <b>“LD BOT V0.2.6 By Unitree”</b>. It is far smaller than the leg motors. The main board has a port labelled <b>LIDAR</b> and the Go2 carries a spinning LiDAR under its chin, so this is most likely the motor that turns it. That is our reading; nothing on the part says so.</p>
     <button class="see" type="button" data-part="lidar">See it in 3D ↑</button>
   </article>
   <article class="part" id="p-fans">
-    <h3>Cooling: two 12 V blower fans <span class="conf h">Read</span></h3>
+    <h3>Cooling: two 12 V blower fans <span class="conf h"><i class="st h"></i>Read</span></h3>
     <p>Small DC brushless blowers from <b>Shenzhen Zhuoming Electronics</b>, 12 V. One sits beside the core board's heatsink and pushes air along its heat pipes; a second is in the body.</p>
     <button class="see" type="button" data-part="fans">See it in 3D ↑</button>
   </article>
@@ -353,23 +384,23 @@ h2{font-size:clamp(21px,2.4vw,28px)}
   <div class="tablewrap"><table>
     <thead><tr><th>Part</th><th>What is printed on it</th><th>Role</th><th>Sure?</th></tr></thead>
     <tbody>
-      <tr><td>Main board</td><td>712 MAIN BOARD-RK V0.21, 2023/6/17</td><td>Connects everything</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Core board</td><td>XF_RK_Core_Board_V10, 8+64G</td><td>Main computer</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Processor</td><td>(ground blank) · RK3588S on the identical humanoid board</td><td>Walking, vision, app</td><td><i class="dot" style="--c:var(--matched)"></i>Matched</td></tr>
-      <tr><td>4G card</td><td>Quectel EG25-G</td><td>Mobile data</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Modem chip</td><td>Qualcomm MDM9207</td><td>Inside the 4G card</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Modem memory</td><td>Nanya NM1282KSLAXAL-3B</td><td>Inside the 4G card</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>RF transceiver</td><td>Qualcomm WTR2965</td><td>Inside the 4G card</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Power amplifiers</td><td>Qorvo 77031, 77033</td><td>Inside the 4G card</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Wi-Fi module</td><td>LB-Link BL-M8852BU1</td><td>Wi-Fi 6 + Bluetooth</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Wi-Fi chip</td><td>Realtek RTL8852BU</td><td>Inside the Wi-Fi module</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Remote radio</td><td>YS.PPRF 23, 2401C front end</td><td>Controller link</td><td><i class="dot" style="--c:var(--hidden)"></i>Partly blank</td></tr>
-      <tr><td>UWB board</td><td>(chips ground blank)</td><td>Follow-me positioning</td><td><i class="dot" style="--c:var(--hidden)"></i>Ground blank</td></tr>
-      <tr><td>Leg motor driver ×12</td><td>M12_MDRV_V1.9.1, 2023/5/10</td><td>Drives one joint</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Small motor board</td><td>LD BOT V0.2.6</td><td>Likely LiDAR spin motor</td><td><i class="dot" style="--c:var(--inferred)"></i>Inferred</td></tr>
-      <tr><td>Ethernet flex</td><td>712 ETH FPC, 2023/5/9</td><td>Wired network port</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Blower fans ×2</td><td>Shenzhen Zhuoming, DC 12 V</td><td>Cooling</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
-      <tr><td>Antennas</td><td>Rainsun (Wi-Fi), plus LoRa, 4G, UWB</td><td>Radios</td><td><i class="dot" style="--c:var(--read)"></i>Read</td></tr>
+      <tr><td>Main board</td><td>712 MAIN BOARD-RK V0.21, 2023/6/17</td><td>Connects everything</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Core board</td><td>XF_RK_Core_Board_V10, 8+64G</td><td>Main computer</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Processor</td><td>(ground blank) · RK3588S on the identical humanoid board</td><td>Walking, vision, app</td><td><i class="st m"></i>Matched</td></tr>
+      <tr><td>4G card</td><td>Quectel EG25-G</td><td>Mobile data</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Modem chip</td><td>Qualcomm MDM9207</td><td>Inside the 4G card</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Modem memory</td><td>Nanya NM1282KSLAXAL-3B</td><td>Inside the 4G card</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>RF transceiver</td><td>Qualcomm WTR2965</td><td>Inside the 4G card</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Power amplifiers</td><td>Qorvo 77031, 77033</td><td>Inside the 4G card</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Wi-Fi module</td><td>LB-Link BL-M8852BU1</td><td>Wi-Fi 6 + Bluetooth</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Wi-Fi chip</td><td>Realtek RTL8852BU</td><td>Inside the Wi-Fi module</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Remote radio</td><td>YS.PPRF 23, 2401C front end</td><td>Controller link</td><td><i class="st x"></i>Partly blank</td></tr>
+      <tr><td>UWB board</td><td>(chips ground blank)</td><td>Follow-me positioning</td><td><i class="st x"></i>Ground blank</td></tr>
+      <tr><td>Leg motor driver ×12</td><td>M12_MDRV_V1.9.1, 2023/5/10</td><td>Drives one joint</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Small motor board</td><td>LD BOT V0.2.6</td><td>Likely LiDAR spin motor</td><td><i class="st i"></i>Inferred</td></tr>
+      <tr><td>Ethernet flex</td><td>712 ETH FPC, 2023/5/9</td><td>Wired network port</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Blower fans ×2</td><td>Shenzhen Zhuoming, DC 12 V</td><td>Cooling</td><td><i class="st h"></i>Read</td></tr>
+      <tr><td>Antennas</td><td>Rainsun (Wi-Fi), plus LoRa, 4G, UWB</td><td>Radios</td><td><i class="st h"></i>Read</td></tr>
     </tbody>
   </table></div>
 
@@ -405,6 +436,37 @@ h2{font-size:clamp(21px,2.4vw,28px)}
 .more b{display:block;color:var(--fg);font-family:"Space Mono",ui-monospace,monospace;margin-top:4px}
 .more small{display:block;color:var(--muted);font-size:12.5px;margin-top:4px}
 .callout.plain{grid-template-columns:1fr}
+
+/* ---- One colour, shapes not colours ----
+   Status is carried by shape: Read = solid circle, Matched = half circle,
+   Ground blank = solid square, Inferred = diamond, Not visible = faint circle. */
+:root{--read:#e9edf3;--matched:#e9edf3;--hidden:#e9edf3;--inferred:#e9edf3;--unseen:#e9edf3}
+h1 span{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--accent);-webkit-text-fill-color:currentColor}
+i.st{display:inline-block;flex:none;width:9px;height:9px;margin-right:7px;vertical-align:0;background:#e9edf3;border-radius:50%;box-shadow:none}
+i.st.m{background:linear-gradient(90deg,#e9edf3 50%,rgba(233,237,243,.22) 50%)}
+i.st.x{border-radius:2px}
+i.st.i{border-radius:1px;transform:rotate(45deg) scale(.82)}
+i.st.n{opacity:.3}
+.legend i.st{box-shadow:none}
+.conf,.conf.h,.conf.m,.conf.x,.conf.i,.conf.n{color:var(--muted);background:rgba(255,255,255,.06)}
+.conf i.st{width:7px;height:7px;margin-right:6px}
+.chip{color:var(--fg);background:rgba(255,255,255,.07)}
+.chip i.st{width:7px;height:7px;margin-right:6px}
+.callout{background:rgba(255,255,255,.028);grid-template-columns:1fr}
+.callout p{color:var(--muted)}
+.callout .ico{display:none}
+.pin.s-m{background:linear-gradient(90deg,rgba(233,237,243,.3) 50%,#07080bd9 50%)}
+.pin.s-x{border-radius:6px}
+.pin.s-i{border-radius:50% 5px 50% 5px}
+.pin.s-n{opacity:.6}
+.pin.on,.pin:hover{background:var(--fg);color:#07080b}
+.plist i.s-x,.clist i.s-x{border-radius:5px}
+.plist i.s-i,.clist i.s-i{border-radius:50% 4px 50% 4px}
+.plist i.s-m,.clist i.s-m{background:linear-gradient(90deg,rgba(233,237,243,.34) 50%,rgba(233,237,243,.08) 50%)}
+.btabs button i{box-shadow:none;background:#e9edf3}
+.btabs button i.s-x{border-radius:2px}
+.btabs button i.s-i{border-radius:1px;transform:rotate(45deg) scale(.85)}
+.btabs button i.s-m{background:linear-gradient(90deg,#e9edf3 50%,rgba(233,237,243,.22) 50%)}
 </style>
   <h2>Same part, other robots</h2>
   <p class="sub">Parts in the Go2 that we have also found inside other robots in the library.</p>
