@@ -266,6 +266,30 @@ i.st.n{opacity:.3}
     </div>
   </section>
 
+  <section class="viewer" id="toon-3d" aria-label="3D model of the Unitree G1 with its parts marked">
+    <div class="stage3d" id="toonstage">
+      <div class="load">Loading the 3D model…</div>
+      <div class="pins"></div>
+      <span class="hint">Drag to turn</span>
+      <div class="bar"><button type="button" data-act="xray" aria-pressed="false">X-ray</button><button type="button" data-act="play" aria-pressed="false">Wave</button><button type="button" data-act="reset">Reset</button></div>
+    </div>
+    <div class="side3d">
+      <div class="info" aria-live="polite"><p class="k">Tap a number</p><p>Each number is a part found in the teardown. X-ray fades the shell to show where the parts sit inside.</p></div>
+      <ol class="plist"></ol>
+    </div>
+  </section>
+  <p class="fine">Robot model: Unitree's own published model via <a href="https://github.com/google-deepmind/mujoco_menagerie" rel="noopener" target="_blank">MuJoCo Menagerie</a>, © Unitree Robotics, <a href="/3d/unitree-g1-license.txt">BSD-3-Clause</a>. Where each board sits inside the body is approximate.</p>
+  <script type="application/json" id="toon-data">{"slug":"unitree-g1","kind":"menagerie","play":"Wave","view":[1.45,-1.0,0.35],"pins":[{"n":1,"part":"brain","name":"Core board: RK3588S","text":"The same computer board as the Go2, readable here.","status":"h","at":[0.03,0.0,0.2],"body":"torso_link","box":[0.012,0.075,0.06]},{"n":2,"part":"main","name":"711 MAIN BOARD","text":"The board the computer plugs into, with the radios and battery input.","status":"h","at":[0.005,-0.05,0.105],"body":"torso_link","box":[0.006,0.17,0.08]},{"n":3,"part":"hidden","name":"Chips ground blank","text":"Two chips on the back of the main board with their markings removed.","status":"x","at":[-0.02,0.06,0.1],"body":"torso_link"},{"n":4,"part":"joints","name":"Joint drivers 711A / 711B","text":"A round driver board in every joint, in two sizes.","status":"h","at":[0.0,0.0,0.0],"body":"left_knee_link"},{"n":5,"part":"imu","name":"IMU board 711-EXT-IMU","text":"The motion sensor that tells the robot which way is down.","status":"h","at":[0.045,0.0,-0.083],"body":"pelvis","box":[0.03,0.03,0.006]},{"n":6,"part":"wifi","name":"Wi-Fi + Bluetooth","text":"A Realtek Wi-Fi 6 module on the main board.","status":"m","at":[0.03,-0.07,0.23],"body":"torso_link"},{"n":7,"part":"radio","name":"Remote radio YS.PPRF","text":"The Go2's remote-control radio board, reused.","status":"m","at":[0.03,0.07,0.23],"body":"torso_link"}]}</script>
+  <script>
+  // Load the 3D only when it is about to be seen; the text never waits on it.
+  (function () {
+    var el = document.getElementById('toon-3d'), go = function () { import('/3d/toon.js') }
+    if (!('IntersectionObserver' in window)) return go()
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); go() } }, { rootMargin: '400px' })
+    io.observe(el)
+  })()
+  </script>
+
   <h2>The short answer</h2>
   <div class="short"><div><span>Brain</span><b>Rockchip RK3588S</b><small>on the XF_RK_Core_Board_V10, 8 GB / 64 GB</small></div><div><span>Main board</span><b>711 MAIN BOARD</b><small>ver 0.16, dated 2024/8/15</small></div><div><span>Joints</span><b>711A / 711B MDRV</b><small>a driver board inside every joint</small></div><div><span>Balance</span><b>711-EXT-IMU</b><small>motion sensor board, dated 2024/9/25</small></div><div><span>Wi-Fi + Bluetooth</span><b>Realtek module</b><small>RTL8852-series, as in the Go2</small></div><div><span>Remote link</span><b>YS.PPRF board</b><small>the same radio board as the Go2</small></div></div>
 

@@ -266,6 +266,30 @@ i.st.n{opacity:.3}
     </div>
   </section>
 
+  <section class="viewer" id="toon-3d" aria-label="3D model of the Unitree Go1 with its parts marked">
+    <div class="stage3d" id="toonstage">
+      <div class="load">Loading the 3D model…</div>
+      <div class="pins"></div>
+      <span class="hint">Drag to turn</span>
+      <div class="bar"><button type="button" data-act="xray" aria-pressed="false">X-ray</button><button type="button" data-act="play" aria-pressed="false">Trot</button><button type="button" data-act="reset">Reset</button></div>
+    </div>
+    <div class="side3d">
+      <div class="info" aria-live="polite"><p class="k">Tap a number</p><p>Each number is a part found in the teardown. X-ray fades the shell to show where the parts sit inside.</p></div>
+      <ol class="plist"></ol>
+    </div>
+  </section>
+  <p class="fine">Robot model: Unitree's own published model via <a href="https://github.com/google-deepmind/mujoco_menagerie" rel="noopener" target="_blank">MuJoCo Menagerie</a>, © Unitree Robotics, <a href="/3d/unitree-go1-license.txt">BSD-3-Clause</a>. Where each board sits inside the body is approximate.</p>
+  <script type="application/json" id="toon-data">{"slug":"unitree-go1","kind":"menagerie","play":"Trot","view":[1.1,-1.3,0.7],"pins":[{"n":1,"part":"jetson","name":"NVIDIA Jetson modules","text":"TM660M-A2 (Tegra X1) compute modules with fans, for the cameras.","status":"h","at":[0.0,0.0,0.02],"body":"trunk","box":[0.1,0.06,0.03]},{"n":2,"part":"pi","name":"Raspberry Pi CM4 Lite","text":"The network computer, on its own carrier board.","status":"h","at":[-0.09,0.025,0.037],"body":"trunk","box":[0.055,0.04,0.006]},{"n":3,"part":"4g","name":"4G: Quectel EG25-G","text":"The same mini PCIe card as in the Go2.","status":"h","at":[-0.13,-0.025,0.035],"body":"trunk","box":[0.051,0.03,0.004]},{"n":4,"part":"cams","name":"Stereo fisheye cameras","text":"Pairs of wide lenses for depth, in the head and body.","status":"h","at":[0.27,0.0,0.0],"body":"trunk"},{"n":5,"part":"motor","name":"Leg motor driver MDRV_TINY","text":"A driver board on the back of every leg motor.","status":"h","at":[0.0,0.0,0.0],"body":"RR_thigh"},{"n":6,"part":"wifi","name":"Wi-Fi module","text":"A small module with two antenna sockets.","status":"n","at":[0.12,-0.03,0.035],"body":"trunk","box":[0.03,0.02,0.004]},{"n":7,"part":"uwb","name":"UWB antennas","text":"Three antennas in the head for follow mode.","status":"h","at":[0.21,0.0,0.055],"body":"trunk"}]}</script>
+  <script>
+  // Load the 3D only when it is about to be seen; the text never waits on it.
+  (function () {
+    var el = document.getElementById('toon-3d'), go = function () { import('/3d/toon.js') }
+    if (!('IntersectionObserver' in window)) return go()
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); go() } }, { rootMargin: '400px' })
+    io.observe(el)
+  })()
+  </script>
+
   <h2>The short answer</h2>
   <div class="short"><div><span>Vision computers</span><b>NVIDIA Jetson modules</b><small>TM660M-A2 chip, the Jetson Nano&#x27;s Tegra X1</small></div><div><span>Network computer</span><b>Raspberry Pi CM4 Lite</b><small>Broadcom BCM2711</small></div><div><span>Mobile data</span><b>Quectel EG25-G</b><small>mini PCIe, Qualcomm MDM9207 inside</small></div><div><span>Eyes</span><b>Stereo fisheye cameras</b><small>camera pairs in the head and body</small></div><div><span>Legs</span><b>MDRV_TINY V0.6</b><small>six transistors, three current sensors per motor</small></div><div><span>Positioning</span><b>UWB + GPS antennas</b><small>for follow mode and location</small></div></div>
 

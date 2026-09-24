@@ -266,6 +266,30 @@ i.st.n{opacity:.3}
     </div>
   </section>
 
+  <section class="viewer" id="toon-3d" aria-label="3D model of the Roborock Qrevo Curv 2 Flow with its parts marked">
+    <div class="stage3d" id="toonstage">
+      <div class="load">Loading the 3D model…</div>
+      <div class="pins"></div>
+      <span class="hint">Drag to turn</span>
+      <div class="bar"><button type="button" data-act="xray" aria-pressed="false">X-ray</button><button type="button" data-act="play" aria-pressed="false">Clean</button><button type="button" data-act="reset">Reset</button></div>
+    </div>
+    <div class="side3d">
+      <div class="info" aria-live="polite"><p class="k">Tap a number</p><p>Each number is a part found in the teardown. X-ray fades the shell to show where the parts sit inside.</p></div>
+      <ol class="plist"></ol>
+    </div>
+  </section>
+  <p class="fine">The 3D shape is our own approximate drawing, sized from the teardown photos, not the maker's CAD. Parts sit roughly where they were found.</p>
+  <script type="application/json" id="toon-data">{"slug":"roborock-qrevo-curv-2-flow","kind":"vacuum","play":"Clean","view":[0.95,-1.15,1.05],"pins":[{"n":1,"part":"battery","name":"Battery: BRR-42C-5200AD","text":"14.4 V, 5200 mAh, eight 18650-size cells.","status":"h","at":[-0.01,0.0,0.08]},{"n":2,"part":"lidar","name":"LiDAR, board DY-07","text":"The spinning laser turret and its board, dated April 2025.","status":"h","at":[0.06,0.0,0.135]},{"n":3,"part":"main","name":"Main board: Beryl Lite","text":"A U-shaped board that wraps round the fan.","status":"h","at":[-0.09,-0.04,0.078]},{"n":4,"part":"soc","name":"Processor, under a shield","text":"Not visible: a soldered metal can covers it.","status":"n","at":[0.03,-0.085,0.078]},{"n":5,"part":"wifi","name":"Wi-Fi module","text":"Soldered next to a USB-C service socket.","status":"n","at":[0.07,-0.05,0.078]},{"n":6,"part":"fan","name":"Suction fan","text":"A blower motor in a spiral housing.","status":"i","at":[-0.075,0.07,0.078]}]}</script>
+  <script>
+  // Load the 3D only when it is about to be seen; the text never waits on it.
+  (function () {
+    var el = document.getElementById('toon-3d'), go = function () { import('/3d/toon.js') }
+    if (!('IntersectionObserver' in window)) return go()
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); go() } }, { rootMargin: '400px' })
+    io.observe(el)
+  })()
+  </script>
+
   <h2>The short answer</h2>
   <div class="short"><div><span>Battery</span><b>BRR-42C-5200AD</b><small>14.4 V · 5200 mAh · 74.88 Wh</small></div><div><span>Navigation</span><b>LiDAR, board DY-07</b><small>spinning laser, detector, angle sensor</small></div><div><span>Main board</span><b>BERYL LITE_MAIN B1</b><small>U-shaped, wraps round the fan</small></div><div><span>Processor</span><b>Under a metal shield</b><small>not visible in the photos</small></div><div><span>Wi-Fi</span><b>Soldered module</b><small>cable to a separate antenna</small></div><div><span>Suction</span><b>Blower fan module</b><small>motor plus impeller housing</small></div></div>
 

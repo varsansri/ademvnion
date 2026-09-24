@@ -11,3 +11,9 @@ __pycache__/
 # Go2: raw OBJs from MuJoCo Menagerie, rebuilt by build_go2.py
 go2/assets/
 go2/scene.glb
+
+# Go1 / G1: raw meshes from MuJoCo Menagerie, rebuilt by build_menagerie.py
+go1/assets/
+go1/scene.glb
+g1/assets/
+g1/scene.glb

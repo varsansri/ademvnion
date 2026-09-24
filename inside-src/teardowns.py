@@ -561,3 +561,65 @@ TEARDOWNS = [
     },
 },
 ]
+
+# ---------------------------------------------------------------------------
+# The cartoon 3D view on each page (src/toon.ts). `at` is in metres in the
+# model frame (X forward, Y left, Z up), relative to `body` when given.
+# `part` is the id of the part card the pin opens; its status (shape) comes
+# from that part. `box` draws an X-ray block for the part.
+MENAGERIE_CREDIT = ("Robot model: Unitree's own published model via "
+                    '<a href="https://github.com/google-deepmind/mujoco_menagerie" rel="noopener" target="_blank">MuJoCo Menagerie</a>, '
+                    '© Unitree Robotics, <a href="/3d/{slug}-license.txt">BSD-3-Clause</a>. '
+                    'Where each board sits inside the body is approximate.')
+DRAWN_CREDIT = ('The 3D shape is our own approximate drawing, sized from the teardown photos, not the maker\'s CAD. '
+                'Parts sit roughly where they were found.')
+
+MODELS = {
+    'segway-navimow-x3': {
+        'kind': 'mower', 'play': 'Mow', 'view': [0.75, -1.0, 1.55], 'credit': DRAWN_CREDIT,
+        'pins': [
+            ('brain', 'Brain: Allwinner MR527', 'The Linux computer, with 4 GB memory and 32 GB storage, on the board behind the camera.', [0.15, -0.05, 0.195], None, None),
+            ('4g', '4G: Quectel EC25', 'Mobile data for network RTK and the app, on the same board.', [0.21, 0.05, 0.195], None, None),
+            ('wifi', 'Wi-Fi + Bluetooth module', 'A small shielded module at the edge of the computer board.', [0.1, 0.07, 0.195], None, None),
+            ('mcu', 'Motor controller: GD32F427', 'The real-time chip that drives the motors and cuts the blade.', [-0.1, 0.0, 0.125], None, None),
+            ('power', 'Three motor drives', 'Transistor banks for the two wheels and the blade.', [-0.2, -0.08, 0.125], None, None),
+            ('radio', 'Long-range radio', 'A sub-GHz chip in its own shielded can on the driver board.', [-0.03, 0.09, 0.125], None, None),
+            ('battery', 'Battery: 276.5 Wh', '24 cylindrical cells, 21.6 V, 12,800 mAh.', [0.04, -0.04, 0.14], None, None),
+        ],
+    },
+    'roborock-qrevo-curv-2-flow': {
+        'kind': 'vacuum', 'play': 'Clean', 'view': [0.95, -1.15, 1.05], 'credit': DRAWN_CREDIT,
+        'pins': [
+            ('battery', 'Battery: BRR-42C-5200AD', '14.4 V, 5200 mAh, eight 18650-size cells.', [-0.01, 0.0, 0.08], None, None),
+            ('lidar', 'LiDAR, board DY-07', 'The spinning laser turret and its board, dated April 2025.', [0.06, 0.0, 0.135], None, None),
+            ('main', 'Main board: Beryl Lite', 'A U-shaped board that wraps round the fan.', [-0.09, -0.04, 0.078], None, None),
+            ('soc', 'Processor, under a shield', 'Not visible: a soldered metal can covers it.', [0.03, -0.085, 0.078], None, None),
+            ('wifi', 'Wi-Fi module', 'Soldered next to a USB-C service socket.', [0.07, -0.05, 0.078], None, None),
+            ('fan', 'Suction fan', 'A blower motor in a spiral housing.', [-0.075, 0.07, 0.078], None, None),
+        ],
+    },
+    'unitree-go1': {
+        'kind': 'menagerie', 'play': 'Trot', 'view': [1.1, -1.3, 0.7], 'credit': MENAGERIE_CREDIT,
+        'pins': [
+            ('jetson', 'NVIDIA Jetson modules', 'TM660M-A2 (Tegra X1) compute modules with fans, for the cameras.', [0.0, 0.0, 0.02], 'trunk', [0.1, 0.06, 0.03]),
+            ('pi', 'Raspberry Pi CM4 Lite', 'The network computer, on its own carrier board.', [-0.09, 0.025, 0.037], 'trunk', [0.055, 0.04, 0.006]),
+            ('4g', '4G: Quectel EG25-G', 'The same mini PCIe card as in the Go2.', [-0.13, -0.025, 0.035], 'trunk', [0.051, 0.03, 0.004]),
+            ('cams', 'Stereo fisheye cameras', 'Pairs of wide lenses for depth, in the head and body.', [0.27, 0.0, 0.0], 'trunk', None),
+            ('motor', 'Leg motor driver MDRV_TINY', 'A driver board on the back of every leg motor.', [0.0, 0.0, 0.0], 'RR_thigh', None),
+            ('wifi', 'Wi-Fi module', 'A small module with two antenna sockets.', [0.12, -0.03, 0.035], 'trunk', [0.03, 0.02, 0.004]),
+            ('uwb', 'UWB antennas', 'Three antennas in the head for follow mode.', [0.21, 0.0, 0.055], 'trunk', None),
+        ],
+    },
+    'unitree-g1': {
+        'kind': 'menagerie', 'play': 'Wave', 'view': [1.45, -1.0, 0.35], 'credit': MENAGERIE_CREDIT,
+        'pins': [
+            ('brain', 'Core board: RK3588S', 'The same computer board as the Go2, readable here.', [0.03, 0.0, 0.2], 'torso_link', [0.012, 0.075, 0.06]),
+            ('main', '711 MAIN BOARD', 'The board the computer plugs into, with the radios and battery input.', [0.005, -0.05, 0.105], 'torso_link', [0.006, 0.17, 0.08]),
+            ('hidden', 'Chips ground blank', 'Two chips on the back of the main board with their markings removed.', [-0.02, 0.06, 0.1], 'torso_link', None),
+            ('joints', 'Joint drivers 711A / 711B', 'A round driver board in every joint, in two sizes.', [0.0, 0.0, 0.0], 'left_knee_link', None),
+            ('imu', 'IMU board 711-EXT-IMU', 'The motion sensor that tells the robot which way is down.', [0.045, 0.0, -0.083], 'pelvis', [0.03, 0.03, 0.006]),
+            ('wifi', 'Wi-Fi + Bluetooth', 'A Realtek Wi-Fi 6 module on the main board.', [0.03, -0.07, 0.23], 'torso_link', None),
+            ('radio', 'Remote radio YS.PPRF', "The Go2's remote-control radio board, reused.", [0.03, 0.07, 0.23], 'torso_link', None),
+        ],
+    },
+}

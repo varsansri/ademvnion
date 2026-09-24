@@ -266,6 +266,30 @@ i.st.n{opacity:.3}
     </div>
   </section>
 
+  <section class="viewer" id="toon-3d" aria-label="3D model of the Segway Navimow X3 with its parts marked">
+    <div class="stage3d" id="toonstage">
+      <div class="load">Loading the 3D model…</div>
+      <div class="pins"></div>
+      <span class="hint">Drag to turn</span>
+      <div class="bar"><button type="button" data-act="xray" aria-pressed="false">X-ray</button><button type="button" data-act="play" aria-pressed="false">Mow</button><button type="button" data-act="reset">Reset</button></div>
+    </div>
+    <div class="side3d">
+      <div class="info" aria-live="polite"><p class="k">Tap a number</p><p>Each number is a part found in the teardown. X-ray fades the shell to show where the parts sit inside.</p></div>
+      <ol class="plist"></ol>
+    </div>
+  </section>
+  <p class="fine">The 3D shape is our own approximate drawing, sized from the teardown photos, not the maker's CAD. Parts sit roughly where they were found.</p>
+  <script type="application/json" id="toon-data">{"slug":"segway-navimow-x3","kind":"mower","play":"Mow","view":[0.75,-1.0,1.55],"pins":[{"n":1,"part":"brain","name":"Brain: Allwinner MR527","text":"The Linux computer, with 4 GB memory and 32 GB storage, on the board behind the camera.","status":"h","at":[0.15,-0.05,0.195]},{"n":2,"part":"4g","name":"4G: Quectel EC25","text":"Mobile data for network RTK and the app, on the same board.","status":"h","at":[0.21,0.05,0.195]},{"n":3,"part":"wifi","name":"Wi-Fi + Bluetooth module","text":"A small shielded module at the edge of the computer board.","status":"h","at":[0.1,0.07,0.195]},{"n":4,"part":"mcu","name":"Motor controller: GD32F427","text":"The real-time chip that drives the motors and cuts the blade.","status":"h","at":[-0.1,0.0,0.125]},{"n":5,"part":"power","name":"Three motor drives","text":"Transistor banks for the two wheels and the blade.","status":"i","at":[-0.2,-0.08,0.125]},{"n":6,"part":"radio","name":"Long-range radio","text":"A sub-GHz chip in its own shielded can on the driver board.","status":"i","at":[-0.03,0.09,0.125]},{"n":7,"part":"battery","name":"Battery: 276.5 Wh","text":"24 cylindrical cells, 21.6 V, 12,800 mAh.","status":"h","at":[0.04,-0.04,0.14]}]}</script>
+  <script>
+  // Load the 3D only when it is about to be seen; the text never waits on it.
+  (function () {
+    var el = document.getElementById('toon-3d'), go = function () { import('/3d/toon.js') }
+    if (!('IntersectionObserver' in window)) return go()
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); go() } }, { rootMargin: '400px' })
+    io.observe(el)
+  })()
+  </script>
+
   <h2>The short answer</h2>
   <div class="short"><div><span>Brain</span><b>Allwinner MR527</b><small>4 GB Rayson LPDDR4X, 32 GB Rayson eMMC</small></div><div><span>Mobile data</span><b>Quectel EC25 4G</b><small>Qualcomm MDM9207 inside</small></div><div><span>Wi-Fi + Bluetooth</span><b>EA6621QF module</b><small>on the computer board</small></div><div><span>Motors + safety</span><b>GigaDevice GD32F427</b><small>Arm Cortex-M4 on the driver board</small></div><div><span>Long-range radio</span><b>Si4463-type chip</b><small>sub-GHz, in its own shielded can</small></div><div><span>Battery</span><b>NBCF2213A pack</b><small>21.6 V · 12,800 mAh · 276.5 Wh</small></div></div>
 

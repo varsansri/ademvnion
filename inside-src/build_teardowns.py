@@ -12,7 +12,7 @@ import io
 import json
 import os
 
-from teardowns import GO2_KEYS, TEARDOWNS
+from teardowns import GO2_KEYS, MODELS, TEARDOWNS
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, '..')
@@ -125,6 +125,43 @@ def head(t):
 '''
 
 
+def viewer(t):
+    """The cartoon 3D view (src/toon.ts, built to /3d/toon.js) and its settings."""
+    m = MODELS.get(t['slug'])
+    if not m:
+        return ''
+    status = {p['id']: p['status'] for p in t['parts']}
+    pins = []
+    for n, (part, name, text, at, body, box) in enumerate(m['pins'], 1):
+        pin = {'n': n, 'part': part, 'name': name, 'text': text, 'status': status[part], 'at': at}
+        if body:
+            pin['body'] = body
+        if box:
+            pin['box'] = box
+        pins.append(pin)
+    cfg = {'slug': t['slug'], 'kind': m['kind'], 'play': m['play'], 'view': m['view'], 'pins': pins}
+    data = json.dumps(cfg, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+    return (f'  <section class="viewer" id="toon-3d" aria-label="3D model of the {e(t["name"])} with its parts marked">\n'
+            '    <div class="stage3d" id="toonstage">\n'
+            '      <div class="load">Loading the 3D model…</div>\n      <div class="pins"></div>\n'
+            '      <span class="hint">Drag to turn</span>\n'
+            '      <div class="bar"><button type="button" data-act="xray" aria-pressed="false">X-ray</button>'
+            f'<button type="button" data-act="play" aria-pressed="false">{e(m["play"])}</button>'
+            '<button type="button" data-act="reset">Reset</button></div>\n'
+            '    </div>\n    <div class="side3d">\n'
+            '      <div class="info" aria-live="polite"><p class="k">Tap a number</p><p>Each number is a part found in the '
+            'teardown. X-ray fades the shell to show where the parts sit inside.</p></div>\n'
+            '      <ol class="plist"></ol>\n    </div>\n  </section>\n'
+            f'  <p class="fine">{m["credit"].format(slug=t["slug"])}</p>\n'
+            f'  <script type="application/json" id="toon-data">{data}</script>\n'
+            '  <script>\n'
+            '  // Load the 3D only when it is about to be seen; the text never waits on it.\n'
+            "  (function () {\n    var el = document.getElementById('toon-3d'), go = function () { import('/3d/toon.js') }\n"
+            "    if (!('IntersectionObserver' in window)) return go()\n"
+            "    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); go() } }, { rootMargin: '400px' })\n"
+            '    io.observe(el)\n  })()\n  </script>\n\n')
+
+
 def page(t):
     used = []
     for p in t['parts']:
@@ -150,6 +187,7 @@ def page(t):
            f'      <div class="stats">{stats}</div>\n'
            f'      <div class="legend">{legend}</div>\n'
            '    </div>\n  </section>\n\n',
+           viewer(t),
            f'  <h2>The short answer</h2>\n  <div class="short">{short}</div>\n\n']
 
     if t.get('boards'):
