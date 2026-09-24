@@ -117,3 +117,16 @@ details,.qa details{border-top:0;border-bottom:0}
 footer{border-top:0}
 a{text-decoration:none}
 main a:not(.card):not(.mini),footer a{color:var(--accent)}
+/* Type: Space Mono for titles, labels and highlights; Space Grotesk for reading. */
+@font-face{font-family:"Space Mono";font-weight:400;font-display:swap;src:url(/fonts/space-mono-400.woff2) format("woff2")}
+@font-face{font-family:"Space Mono";font-weight:700;font-display:swap;src:url(/fonts/space-mono-700.woff2) format("woff2")}
+@font-face{font-family:"Space Grotesk";font-weight:300 700;font-display:swap;src:url(/fonts/space-grotesk.woff2) format("woff2")}
+body{font-family:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3,h4,h5,.eyebrow,.brand,th{font-family:"Space Mono",ui-monospace,Menlo,Consolas,monospace}
+h1,h2{font-weight:700;letter-spacing:-.045em}
+h3{font-weight:700;letter-spacing:-.02em}
+.eyebrow,.brand,th{letter-spacing:.06em}
+h1{font-size:clamp(28px,4.4vw,46px);line-height:1.08}
+.card h3{font-size:18px}
+.side h4,.side h5{letter-spacing:.06em}
+.totals b,.mini,.qa summary,.cta b{font-family:"Space Mono",ui-monospace,Menlo,Consolas,monospace}

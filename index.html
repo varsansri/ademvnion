@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="preload" href="/fonts/space-mono-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Umami. Every page needs its own copy: four static builds, no shared include. -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="473ac96b-268f-4710-9840-e8f27f67fac9"></script>
@@ -173,6 +175,20 @@
   .qa details:hover,.qa details[open]{background:rgba(255,255,255,.03)}
 
   @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+/* Type: Space Mono for titles, labels and highlights; Space Grotesk for reading. */
+@font-face{font-family:"Space Mono";font-weight:400;font-display:swap;src:url(/fonts/space-mono-400.woff2) format("woff2")}
+@font-face{font-family:"Space Mono";font-weight:700;font-display:swap;src:url(/fonts/space-mono-700.woff2) format("woff2")}
+@font-face{font-family:"Space Grotesk";font-weight:300 700;font-display:swap;src:url(/fonts/space-grotesk.woff2) format("woff2")}
+body{font-family:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3,h4,h5,.eyebrow,.brand,th{font-family:"Space Mono",ui-monospace,Menlo,Consolas,monospace}
+h1,h2{font-weight:700;letter-spacing:-.045em}
+h3{font-weight:700;letter-spacing:-.02em}
+.eyebrow,.brand,th{letter-spacing:.06em}
+h1{font-size:clamp(34px,6.4vw,72px);line-height:1.04;max-width:16ch}
+h2{font-size:clamp(25px,3.6vw,40px);line-height:1.12;max-width:22ch}
+.btn,nav .links .navcta,.compare h3,.step .n,.step.now h3::after,.qa summary{font-family:"Space Mono",ui-monospace,Menlo,Consolas,monospace}
+.btn{font-weight:700;font-size:14px}
+.compare h3{letter-spacing:.06em}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Adem","alternateName":"Ademvnion","url":"https://ademvnion.com/","logo":"https://ademvnion.com/img/logo.png","image":"https://ademvnion.com/img/og.jpg","description":"Adem builds Vnion, wearable human enhancement, and ships free browser software for designing robots and taking real ones apart."}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Ademvnion","url":"https://ademvnion.com/","publisher":{"@type":"Organization","name":"Adem","url":"https://ademvnion.com/"}}</script>
