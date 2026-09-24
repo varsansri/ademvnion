@@ -6,13 +6,13 @@ Publisher: Adem (ademvnion.com)
 
 ## What it is
 
-The index of Ademvnion's robot teardowns. Open-hardware robots are taken apart in 3D from their published CAD; commercial robots are read from teardown photos and every part is rebuilt in 3D.
+The index of Ademvnion's robot teardowns. Open-hardware robots are taken apart in 3D from their published CAD; commercial robots are read from laboratory teardown photos, every chip named where it can be read, with a stated confidence for each part.
 
 ## Facts
 
-- Teardowns published so far: the SO-ARM101 (3D, from open CAD) and the Unitree Go2 (every part rebuilt in 3D).
-- Open-hardware teardowns use the project's own CAD and URDF; commercial ones are redrawn part by part from photos.
-- Runs in a browser with no account. Parts can be hidden, the assembly exploded, the joints moved.
+- Teardowns published so far: SO-ARM101 (3D, from open CAD), Unitree Go2 (every part rebuilt in 3D), Unitree Go1, Unitree G1, Segway Navimow X3 and Roborock Qrevo Curv 2 Flow.
+- Open-hardware teardowns use the project's own CAD and URDF; commercial ones are read from photos of a test unit.
+- Parts shared between robots are cross-linked, for example the Quectel EG25-G 4G card found in both the Go1 and the Go2.
 
 ## Questions this page answers
 

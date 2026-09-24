@@ -9,6 +9,10 @@ Updated 2026-09-24. Each reference below is a plain-text twin of a canonical HTM
 - [Adem Forge — robot design software in the browser](https://ademvnion.com/app/) — reference: https://ademvnion.com/ai/forge.md
 - [Inside the SO-ARM101 — every part of an open-source robot arm](https://ademvnion.com/inside/so-arm101/) — reference: https://ademvnion.com/ai/so-arm101.md
 - [What's inside the Unitree Go2 — every chip, rebuilt in 3D](https://ademvnion.com/inside/unitree-go2/) — reference: https://ademvnion.com/ai/unitree-go2.md
+- [What's inside the Segway Navimow X3 robot mower](https://ademvnion.com/inside/segway-navimow-x3/) — reference: https://ademvnion.com/ai/segway-navimow-x3.md
+- [What's inside the Roborock Qrevo Curv 2 Flow](https://ademvnion.com/inside/roborock-qrevo-curv-2-flow/) — reference: https://ademvnion.com/ai/roborock-qrevo-curv-2-flow.md
+- [What's inside the Unitree G1 humanoid](https://ademvnion.com/inside/unitree-g1/) — reference: https://ademvnion.com/ai/unitree-g1.md
+- [What's inside the Unitree Go1 robot dog](https://ademvnion.com/inside/unitree-go1/) — reference: https://ademvnion.com/ai/unitree-go1.md
 - [Inside real robots — interactive teardowns](https://ademvnion.com/inside/) — reference: https://ademvnion.com/ai/inside.md
 - [Ademvnion — wearable human enhancement](https://ademvnion.com/) — reference: https://ademvnion.com/ai/home.md
 

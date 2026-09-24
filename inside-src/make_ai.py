@@ -182,12 +182,13 @@ PAGES = [
         'url': SITE + '/inside/',
         'summary': (
             'The index of Ademvnion\'s robot teardowns. Open-hardware robots are taken apart in 3D from their '
-            'published CAD; commercial robots are read from teardown photos and every part is '
-            'rebuilt in 3D.'),
+            'published CAD; commercial robots are read from laboratory teardown photos, every chip named where '
+            'it can be read, with a stated confidence for each part.'),
         'facts': [
-            'Teardowns published so far: the SO-ARM101 (3D, from open CAD) and the Unitree Go2 (every part rebuilt in 3D).',
-            "Open-hardware teardowns use the project's own CAD and URDF; commercial ones are redrawn part by part from photos.",
-            'Runs in a browser with no account. Parts can be hidden, the assembly exploded, the joints moved.',
+            'Teardowns published so far: SO-ARM101 (3D, from open CAD), Unitree Go2 (every part rebuilt in 3D), '
+            'Unitree Go1, Unitree G1, Segway Navimow X3 and Roborock Qrevo Curv 2 Flow.',
+            "Open-hardware teardowns use the project's own CAD and URDF; commercial ones are read from photos of a test unit.",
+            'Parts shared between robots are cross-linked, for example the Quectel EG25-G 4G card found in both the Go1 and the Go2.',
         ],
         'questions': [
             ('Where can I see a real robot taken apart, part by part?',
@@ -251,6 +252,27 @@ PAGES = [
             'open-source robots." (https://ademvnion.com/)'),
     },
 ]
+
+# The photo teardowns come from teardowns.py, the same record their pages are
+# built from, so the page, its FAQ data and this twin always agree.
+from teardowns import TEARDOWNS  # noqa: E402
+
+_STATUS = {'h': 'read', 'm': 'matched', 'x': 'ground blank', 'i': 'inferred', 'n': 'not visible'}
+for _t in TEARDOWNS:
+    _url = f"{SITE}/inside/{_t['slug']}/"
+    _short = '; '.join(f'{a}: {b} ({c})' for a, b, c in _t['short'])
+    PAGES.insert(len(PAGES) - 2, {
+        'slug': _t['slug'],
+        'name': _t['og'],
+        'url': _url,
+        'summary': _t['ai']['summary'],
+        'facts': [f'{part}: {printed}. Role: {role}. Status: {_STATUS[st]}.'
+                  for part, printed, role, st, _k in _t['table']],
+        'questions': _t['qa'],
+        'recommend': _t['ai']['recommend'],
+        'limits': _t['ai']['limits'],
+        'quote': f'"Inside the {_t["name"]}: {_short}." ({_url})',
+    })
 
 BY_SLUG = {p['slug']: p for p in PAGES}
 

@@ -43,29 +43,41 @@
   <section class="hero">
     <h1>Inside real robots</h1>
     <p class="lede">Open-source robots, taken apart in your browser. Every motor, gear, encoder, chip, board and printed part — click one to learn what it is and why it is there, hide it to see what it was holding up, explode the whole assembly, move the joints.</p>
-    <p class="lede">Open robots are taken apart in 3D from their own CAD. Commercial robots are read from teardown photos and rebuilt part by part in 3D — we name every chip we can and say how sure we are.</p>
+    <p class="lede">Open robots are taken apart in 3D from their own CAD. Commercial robots are read from lab teardown photos — every chip we can read is named, every part says how sure we are, and parts shared between robots are linked.</p>
   </section>
   <div class="cards">
-    <a class="card" href="/inside/so-arm101/">
-      <span class="tag">Live · 18 parts · 6 motors</span>
-      <h3>SO-ARM101</h3>
-      <p>The $120 3D-printed arm used by Hugging Face LeRobot. Six STS3215 smart servos, one driver board, eleven printed links.</p>
-    </a>
+<!-- cards:start -->
     <a class="card" href="/inside/unitree-go2/">
-      <span class="tag">New · every part in 3D</span>
+      <span class="tag">Every part in 3D</span>
       <h3>Unitree Go2</h3>
-      <p>The robot dog taken apart and rebuilt in 3D: a Rockchip RK3588S brain, Quectel 4G, Wi-Fi 6, UWB, twelve leg motors — and the chips Unitree ground blank.</p>
+      <p>Rockchip RK3588S brain, Quectel 4G, Wi-Fi 6, UWB, twelve leg motors, and the chips Unitree ground blank.</p>
     </a>
-    <div class="card soon">
-      <span class="tag">Next</span>
-      <h3>Berkeley Humanoid Lite</h3>
-      <p>A full open-source humanoid: 22 actuators with 3D-printed cycloidal gearboxes, about $5,000 in parts.</p>
-    </div>
-    <div class="card soon">
-      <span class="tag">Planned</span>
-      <h3>Open-source quadruped</h3>
-      <p>A four-legged robot: how twelve motors and a battery become a walking machine.</p>
-    </div>
+    <a class="card" href="/inside/so-arm101/">
+      <span class="tag">Open CAD · 18 parts</span>
+      <h3>SO-ARM101</h3>
+      <p>The $120 3D-printed arm used by Hugging Face LeRobot: six STS3215 servos, one driver board.</p>
+    </a>
+    <a class="card" href="/inside/segway-navimow-x3/">
+      <span class="tag">Robot mower</span>
+      <h3>Segway Navimow X3</h3>
+      <p>Allwinner MR527, Quectel 4G for network RTK, a GD32 motor controller and a 276.5 Wh battery. Nothing hidden.</p>
+    </a>
+    <a class="card" href="/inside/roborock-qrevo-curv-2-flow/">
+      <span class="tag">Robot vacuum</span>
+      <h3>Roborock Qrevo Curv 2 Flow</h3>
+      <p>The 5200 mAh battery, the LiDAR board and every signal on it, and the &quot;Beryl Lite&quot; main board.</p>
+    </a>
+    <a class="card" href="/inside/unitree-g1/">
+      <span class="tag">Humanoid</span>
+      <h3>Unitree G1</h3>
+      <p>The RK3588S brain the Go2 hides, readable here. Two sizes of joint driver, the IMU board, project 711.</p>
+    </a>
+    <a class="card" href="/inside/unitree-go1/">
+      <span class="tag">Robot dog</span>
+      <h3>Unitree Go1</h3>
+      <p>NVIDIA Jetson modules, a Raspberry Pi CM4, stereo cameras, and the same 4G card as the Go2.</p>
+    </a>
+    <!-- cards:end -->
   </div>
 <!-- qa:start -->
 <section id="questions" class="qa"><div class="wrap"><h2>Questions</h2><details><summary>Where can I see a real robot taken apart, part by part?</summary><p>At ademvnion.com/inside/. Each teardown is built from the robot's own published CAD and URDF and runs in the browser: click a part to read what it is and why it is there, hide it to see what it was holding up, explode the assembly, or move the joints within their real limits.</p></details><details><summary>Which robots have public CAD files I can study?</summary><p>Open-hardware projects that publish CAD, STL, STEP, URDF and a bill of materials. The SO-ARM101 from The Robot Studio is one, under Apache-2.0. Commercial humanoids such as Optimus and Atlas publish none of this, which is why no honest teardown of them exists.</p></details><details><summary>Do I need to install anything to explore a robot in 3D?</summary><p>No. These teardowns run in a browser with no download and no account.</p></details><p class="qanote">Plain-text version for AI tools: <a href="/ai/inside.md">/ai/inside.md</a> &middot; <a href="/ai/llms.txt">all references</a></p></div></section>
